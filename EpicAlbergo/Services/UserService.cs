@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Data.SqlClient;
 using System.Security.Claims;
+using EpicAlbergo.Models.Dto;
 
 namespace EpicAlbergo.Services
 {
@@ -17,7 +18,7 @@ namespace EpicAlbergo.Services
             _http = http;
         }
 
-        public User GetUser(User user)
+        public User GetUser(UserDto user)
         {
             try
             {
@@ -57,7 +58,7 @@ namespace EpicAlbergo.Services
             return null;
         }
 
-        public async Task Login(User user)
+        public async Task Login(UserDto user)
         {
             var claims = new List<Claim>
             {
