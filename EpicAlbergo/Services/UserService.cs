@@ -58,7 +58,7 @@ namespace EpicAlbergo.Services
             return null;
         }
 
-        public async Task Login(UserDto user)
+        public async Task Login(User user)
         {
             var claims = new List<Claim>
             {

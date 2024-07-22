@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using EpicAlbergo.Models;
+using EpicAlbergo.Models.Dto;
 using EpicAlbergo.Services;
 
 namespace EpicAlbergo.Controllers
@@ -20,19 +20,19 @@ namespace EpicAlbergo.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index([Bind("Username,Password")] User user)
+        public async Task<IActionResult> Index([Bind("Username,Password")] UserDto model)
         {
             if(!ModelState.IsValid)
             {
                 return View();
             }
-            var u = _userService.GetUser(user);
-            if(u == null)
+            var user = _userService.GetUser(model);
+            if(user == null)
             {
                 ModelState.AddModelError("Username", "Username o password errati");
                 return View();
             }
-            _userService.Login(u);
+            _userService.Login(user);
             return RedirectToAction("Index", "Home");
         }
     }

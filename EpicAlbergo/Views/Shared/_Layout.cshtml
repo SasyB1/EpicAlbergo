@@ -26,6 +26,16 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
+                    <div class="d-lg-flex flex-lg-fill justify-content-end align-items-center">
+                        @if (!Context.User.Identity.IsAuthenticated)
+                        {
+                            <a asp-controller="Auth" asp-action="Index" class="text-white fw-semibold me-3">Login</a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Auth" asp-action="Logout" class="text-white fw-semibold me-3">Logout</a>
+                        }
+                    </div>
                 </div>
             </div>
         </nav>
