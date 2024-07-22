@@ -144,7 +144,7 @@ namespace EpicAlbergo.Services
                 {
                     conn.Open();
                     const string SELECT_COMMAND = @"
-                        SELECT ReservationId, CustomerId, RoomId, ReservationNumber, ReservationDate, ReservationStartStayDate, ReservationEndStayDate, ReservationDeposit, ReservationPrice, ReservationType
+                        SELECT CustomerId, RoomId, ReservationNumber, ReservationDate, ReservationStartStayDate, ReservationEndStayDate, ReservationDeposit, ReservationPrice, ReservationType
                         FROM Reservations";
                     using (SqlCommand cmd = new SqlCommand(SELECT_COMMAND, conn))
                     {
@@ -154,7 +154,6 @@ namespace EpicAlbergo.Services
                             {
                                 ReservationDto reservation = new ReservationDto
                                 {
-                                    ReservationId = reader.GetInt32(0),
                                     CustomerId = reader.GetInt32(1),
                                     RoomId = reader.GetInt32(2),
                                     ReservationNumber = reader.GetString(3),
