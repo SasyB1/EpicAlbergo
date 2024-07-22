@@ -1,0 +1,40 @@
+﻿@model IEnumerable<ReservationDto>
+
+<table>
+    <thead>
+        <tr>
+            <th>CustomerId</th>
+            <th>RoomId</th>
+            <th>ReservationNumber</th>
+            <th>ReservationDate</th>
+            <th>ReservationStartStayDate</th>
+            <th>ReservationEndStayDate</th>
+            <th>ReservationDeposit</th>
+            <th>ReservationPrice</th>
+            <th>ReservationType</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var reservation in Model)
+        {
+            <tr>
+                <td>@reservation.CustomerId</td>
+                <td>@reservation.RoomId</td>
+                <td>@reservation.ReservationNumber</td>
+                <td>@reservation.ReservationDate.ToString("yyyy-MM-dd")</td>
+                <td>@reservation.ReservationStartStayDate.ToString("yyyy-MM-dd")</td>
+                <td>@reservation.ReservationEndStayDate.ToString("yyyy-MM-dd")</td>
+                <td>@reservation.ReservationDeposit.ToString("C")</td>
+                <td>@reservation.ReservationPrice.ToString("C")</td>
+                <td>@reservation.ReservationType</td>
+                <td>
+                    <form method="get" action="@Url.Action("Checkout", "YourControllerName")">
+                        <input type="hidden" name="reservationId" value="@reservation.ReservationId" />
+                        <button type="submit" class="btn btn-primary">Checkout</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

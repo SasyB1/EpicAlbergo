@@ -1,11 +1,6 @@
 ﻿namespace EpicAlbergo.Models.Dto
 {
-    public enum ReservationType
-    {
-        OvernightWithBreakfast,
-        FullBoard,
-        HalfBoard
-    }
+  
     public class ReservationDto
     {
         public int CustomerId { get; set; }

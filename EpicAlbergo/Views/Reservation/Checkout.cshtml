@@ -1,0 +1,15 @@
+﻿@model CheckoutDto
+
+<h2>Checkout Details</h2>
+
+<p><strong>Reservation Number:</strong> @Model.ReservationNumber</p>
+<p><strong>Reservation Date:</strong> @Model.ReservationDate.ToString("yyyy-MM-dd")</p>
+<p><strong>Total Price:</strong> @Model.TotalPrice.ToString("C")</p>
+
+<h3>Services:</h3>
+<ul>
+    @foreach (var service in Model.Services)
+    {
+        <li>@service.ServiceType</li>
+    }
+</ul>

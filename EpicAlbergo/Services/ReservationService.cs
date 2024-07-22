@@ -1,5 +1,6 @@
 ﻿using EpicAlbergo.Models.Dto;
 using Microsoft.Data.SqlClient;
+using EpicAlbergo.Models;
 namespace EpicAlbergo.Services
 {
     public class ReservationService
@@ -176,6 +177,95 @@ namespace EpicAlbergo.Services
             }
             return reservations;
         }
+
+        public async Task<CheckoutDto> Checkout(int reservationId)
+        {
+            try
+            {
+                var checkout = new CheckoutDto
+                {
+                    Services = new List<Service>()
+                };
+
+                using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+                {
+                    await conn.OpenAsync();
+
+                    const string SELECT_COMMAND = @"
+                SELECT 
+                    R.ReservationNumber,
+                    R.ReservationDate,
+                    (R.ReservationPrice - R.ReservationDeposit + COALESCE(SUM(RS.ServicePrice * RS.ServiceQuantity), 0)) AS TotalPrice
+                FROM 
+                    dbo.Reservations AS R
+                LEFT JOIN 
+                    dbo.ReservationsServices AS RS ON R.ReservationId = RS.ReservationId
+                LEFT JOIN 
+                    dbo.Services AS S ON RS.ServiceId = S.ServiceId
+                WHERE 
+                    R.ReservationId = @ReservationId
+                GROUP BY 
+                    R.ReservationNumber, 
+                    R.ReservationDate, 
+                    R.ReservationPrice, 
+                    R.ReservationDeposit";
+
+                    using (var cmd = new SqlCommand(SELECT_COMMAND, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@ReservationId", reservationId);
+
+                        using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            if (await reader.ReadAsync())
+                            {
+                                checkout.ReservationNumber = reader.GetString(0);
+                                checkout.ReservationDate = reader.GetDateTime(1);
+                                checkout.TotalPrice = reader.GetDecimal(2);
+                            }
+                            else
+                            {
+                                throw new Exception("Prenotazione non trovata.");
+                            }
+                        }
+                    }
+
+                    const string SELECT_SERVICES_COMMAND = @"
+                SELECT 
+                    S.ServiceType,
+                    RS.ServiceQuantity
+                FROM 
+                    dbo.ReservationsServices AS RS
+                JOIN 
+                    dbo.Services AS S ON RS.ServiceId = S.ServiceId
+                WHERE 
+                    RS.ReservationId = @ReservationId";
+
+                    using (var cmdServices = new SqlCommand(SELECT_SERVICES_COMMAND, conn))
+                    {
+                        cmdServices.Parameters.AddWithValue("@ReservationId", reservationId);
+
+                        using (var readerServices = await cmdServices.ExecuteReaderAsync())
+                        {
+                            while (await readerServices.ReadAsync())
+                            {
+                                var service = new Service
+                                {
+                                    ServiceType = readerServices.GetString(0)
+                                };
+                                checkout.Services.Add(service);
+                            }
+                        }
+                    }
+                }
+
+                return checkout;
+            }
+            catch (Exception ex)
+            {
+                // Opzionalmente, puoi loggare l'eccezione qui
+                throw new Exception("Errore nel recupero del checkout: " + ex.Message, ex);
+            }
+        }
+
     }
 }
- 

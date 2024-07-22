@@ -1,6 +1,7 @@
 ﻿using EpicAlbergo.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 using EpicAlbergo.Services;
+using EpicAlbergo.Models;
 
 namespace EpicAlbergo.Controllers
 {
@@ -13,7 +14,10 @@ namespace EpicAlbergo.Controllers
             _reservationService = reservationService;
         }
 
-
+        public IActionResult Index()
+        {
+            return View(_reservationService.GetAllReservations());
+        }
         public IActionResult RegisterReservation()
         {
             return View();
@@ -56,5 +60,17 @@ namespace EpicAlbergo.Controllers
             return View(serviceReservation);
         }
 
+        public async Task<IActionResult> Checkout(int reservationId)
+            {
+            try
+            {
+                var checkoutDto = await _reservationService.Checkout(reservationId);
+                return View("Checkout");
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Index", new { errorMessage = "Errore durante il checkout: " + ex.Message });
+            }
+        }
     }
 }
