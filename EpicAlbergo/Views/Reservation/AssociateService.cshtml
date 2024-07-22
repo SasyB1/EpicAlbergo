@@ -1,0 +1,48 @@
+﻿@model EpicAlbergo.Models.Dto.ServiceReservationDto
+
+@{
+    ViewBag.Title = "Associate Service to Reservation";
+}
+
+<h1>Associate Service to Reservation</h1>
+
+<form asp-action="AssociateService" method="post">
+    <div class="form-group">
+        <label for="reservationNumber">Reservation Number</label>
+        <select id="reservationNumber" name="reservationNumber" class="form-control">
+            @foreach (var item in ViewBag.ReservationNumber)
+            {
+                <option value="@item.ReservationNumber">@item.ReservationNumber</option>
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label asp-for="ServiceId" class="control-label"></label>
+        <input asp-for="ServiceId" class="form-control" />
+        <span asp-validation-for="ServiceId" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="ServiceDate" class="control-label"></label>
+        <input asp-for="ServiceDate" class="form-control" />
+        <span asp-validation-for="ServiceDate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="ServiceQuantity" class="control-label"></label>
+        <input asp-for="ServiceQuantity" class="form-control" />
+        <span asp-validation-for="ServiceQuantity" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="ServicePrice" class="control-label"></label>
+        <input asp-for="ServicePrice" class="form-control" />
+        <span asp-validation-for="ServicePrice" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Add Service" class="btn btn-primary" />
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
