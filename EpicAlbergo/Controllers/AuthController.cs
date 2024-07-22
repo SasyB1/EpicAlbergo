@@ -4,7 +4,7 @@ using EpicAlbergo.Services;
 
 namespace EpicAlbergo.Controllers
 {
-   
+
     public class AuthController : Controller
     {
         private readonly UserService _userService;
@@ -22,17 +22,23 @@ namespace EpicAlbergo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index([Bind("Username,Password")] UserDto model)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View();
             }
             var user = _userService.GetUser(model);
-            if(user == null)
+            if (user == null)
             {
                 ModelState.AddModelError("Username", "Username o password errati");
                 return View();
             }
             _userService.Login(user);
+            return RedirectToAction("Index", "Home");
+        }
+
+        public async Task<IActionResult> Logout()
+        {
+            _userService.Logout();
             return RedirectToAction("Index", "Home");
         }
     }
