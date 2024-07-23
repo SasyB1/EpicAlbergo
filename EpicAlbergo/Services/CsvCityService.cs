@@ -43,5 +43,7 @@ namespace EpicAlbergo.Services
             _cityList.Select(c => c.Province)
             // distinct elimina i duplicati
             .Distinct();
+
+        
     }
 }

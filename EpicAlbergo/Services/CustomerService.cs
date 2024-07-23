@@ -18,7 +18,7 @@ namespace EpicAlbergo.Services
             _config = config;
         }
 
-        public void AddCustomer(Customer customer)
+        public void AddCustomer(PersonalDataViewModel customer)
         {
             try
             {

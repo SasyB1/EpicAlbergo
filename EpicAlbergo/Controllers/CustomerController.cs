@@ -2,6 +2,7 @@
 using EpicAlbergo.Services;
 using EpicAlbergo.Models.Dto;
 using EpicAlbergo.Models;
+using Newtonsoft.Json;
 
 
 namespace EpicAlbergo.Controllers
@@ -40,11 +41,11 @@ namespace EpicAlbergo.Controllers
             var cities = _cityService.GetByProvince(province).OrderBy(c => c.Name);
             return Json(cities);
         }
+      
 
         [HttpPost]
         public IActionResult FiscalCode(FiscalCodeViewModel model)
         {
-            // validazione lato server
             if (ModelState.IsValid)
             {
                 try
@@ -58,8 +59,17 @@ namespace EpicAlbergo.Controllers
                         Birthday = model.Birthday,
                         Gender = model.Gender == 'F' ? Gender.Female : Gender.Male
                     });
-                    TempData["FiscalCode"] = fc;
-                    return RedirectToAction("Register", new { fiscalCode = fc });
+                    var customerData = new
+                    {
+                        FiscalCode = fc,
+                        FirstName = model.FirstName,
+                        LastName = model.LastName,
+                        Birthday = model.Birthday.ToString("yyyy-MM-dd"),
+                        Gender = model.Gender,
+                    };
+
+                    TempData["CustomerData"] = JsonConvert.SerializeObject(customerData);
+                    return RedirectToAction("Register");
                 }
                 catch (Exception ex)
                 {
@@ -70,18 +80,25 @@ namespace EpicAlbergo.Controllers
         }
 
 
+
         public IActionResult Register()
         {
             var model = new PersonalDataViewModel();
-
-            // Recupera il codice fiscale da TempData
-            if (TempData["FiscalCode"] != null)
+            if (TempData["CustomerData"] != null)
             {
-                model.CustomerTaxIdCode = TempData["FiscalCode"].ToString();
+                var customerDataJson = TempData["CustomerData"].ToString();
+                var customerData = JsonConvert.DeserializeObject<dynamic>(customerDataJson);
+
+                model.CustomerTaxIdCode = customerData.FiscalCode;
+                model.CustomerName = customerData.FirstName;
+                model.CustomerSurname = customerData.LastName;
+                model.CustomerBirthday = DateOnly.Parse(customerData.Birthday.ToString()); 
+                model.Gender = customerData.Gender.ToString()[0]; 
             }
 
             return View(model);
         }
+
 
         [HttpPost]
         public IActionResult Register(PersonalDataViewModel model)
@@ -90,32 +107,15 @@ namespace EpicAlbergo.Controllers
             {
                 try
                 {
-                    var customer = new Customer
-                    {
-                        CustomerName = model.FirstName,
-                        CustomerSurname = model.LastName,
-                        CustomerBirthCity = _cityService.GetCityById(model.BirthOfCity).Name,
-                        CustomerAddress = model.Address,
-                        CustomerCity = model.City,
-                        CustomerZIPCode = model.ZIPCode,
-                        CustomerEmail = model.Email,
-                        CustomerHomeTelephone = model.HomeTelephone, // Assicurati di includere questo campo
-                        CustomerTelephone = model.Telephone,
-                        CustomerTaxIdCode = model.CustomerTaxIdCode, // Usa il codice fiscale dal modello
-                        CustomerBirthday = model.Birthday,
-                        Gender = model.Gender
-                    };
-
-                    _customerService.AddCustomer(customer); // Aggiungi il metodo nel servizio per salvare i dati
-                    return RedirectToAction("Index"); // Redirect dopo la registrazione
+                    _customerService.AddCustomer(model); 
+                    return RedirectToAction("Index", "Home");
                 }
                 catch (Exception ex)
                 {
                     ModelState.AddModelError("registration_error", "Si è verificato un problema durante la registrazione");
                 }
             }
-
-            return View(model); // Ritorna alla vista con errori se la validazione fallisce
+            return View(model); 
         }
 
     }
