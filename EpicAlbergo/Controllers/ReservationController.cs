@@ -20,6 +20,7 @@ namespace EpicAlbergo.Controllers
         }
         public IActionResult RegisterReservation()
         {
+            ViewBag.ReservationTypes = Enum.GetValues(typeof(ReservationType)).Cast<ReservationType>();
             return View();
         }
 

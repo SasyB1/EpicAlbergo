@@ -1,0 +1,84 @@
+﻿@using EpicAlbergo.Models.Dto
+@model EpicAlbergo.Models.Dto.ReservationDto
+
+@{
+    ViewData["Title"] = "Registra Prenotazione";
+    var reservationTypes = ViewBag.ReservationTypes as IEnumerable<ReservationType>;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="RegisterReservation" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group">
+        <label asp-for="CustomerId" class="control-label"></label>
+        <input asp-for="CustomerId" class="form-control" />
+        <span asp-validation-for="CustomerId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="RoomId" class="control-label"></label>
+        <input asp-for="RoomId" class="form-control" />
+        <span asp-validation-for="RoomId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ReservationDate" class="control-label"></label>
+        <input asp-for="ReservationDate" class="form-control" type="date" />
+        <span asp-validation-for="ReservationDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ReservationStartStayDate" class="control-label"></label>
+        <input asp-for="ReservationStartStayDate" class="form-control" type="date" />
+        <span asp-validation-for="ReservationStartStayDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ReservationEndStayDate" class="control-label"></label>
+        <input asp-for="ReservationEndStayDate" class="form-control" type="date" />
+        <span asp-validation-for="ReservationEndStayDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ReservationDeposit" class="control-label"></label>
+        <input asp-for="ReservationDeposit" class="form-control" type="number" step="0.01" />
+        <span asp-validation-for="ReservationDeposit" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ReservationPrice" class="control-label"></label>
+        <input asp-for="ReservationPrice" class="form-control" type="number" step="0.01" />
+        <span asp-validation-for="ReservationPrice" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ReservationType" class="control-label"></label>
+        <select asp-for="ReservationType" class="form-control">
+            <option value="">Seleziona un tipo di prenotazione</option>
+            @if (reservationTypes != null)
+            {
+                @foreach (var type in reservationTypes)
+                {
+                    <option value="@type">@type.ToString()</option>
+                }
+            }
+        </select>
+        <span asp-validation-for="ReservationType" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Registra" class="btn btn-primary" />
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Torna alla lista delle prenotazioni</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

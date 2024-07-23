@@ -20,14 +20,13 @@ namespace EpicAlbergo.Services
                 {
                     conn.Open();
                     const string INSERT_COMMAND =
-                        "INSERT INTO Reservations (CustomerId, RoomId, ReservationNumber, ReservationDate, ReservationStartStayDate, ReservationEndStayDate, ReservationDeposit, ReservationPrice, ReservationType) " +
-                        "VALUES (@CustomerId, @RoomId, @ReservationNumber, @ReservationDate, @ReservationStartStayDate, @ReservationEndStayDate, @ReservationDeposit, @ReservationPrice, @ReservationType)";
+                        "INSERT INTO Reservations (CustomerId, RoomId, ReservationDate, ReservationStartStayDate, ReservationEndStayDate, ReservationDeposit, ReservationPrice, ReservationType) " +
+                        "VALUES (@CustomerId, @RoomId, @ReservationDate, @ReservationStartStayDate, @ReservationEndStayDate, @ReservationDeposit, @ReservationPrice, @ReservationType)";
 
                     using (SqlCommand cmd = new SqlCommand(INSERT_COMMAND, conn))
                     {
                         cmd.Parameters.AddWithValue("@CustomerId", reservation.CustomerId);
                         cmd.Parameters.AddWithValue("@RoomId", reservation.RoomId);
-                        cmd.Parameters.AddWithValue("@ReservationNumber", reservation.ReservationNumber);
                         cmd.Parameters.AddWithValue("@ReservationDate", reservation.ReservationDate);
                         cmd.Parameters.AddWithValue("@ReservationStartStayDate", reservation.ReservationStartStayDate);
                         cmd.Parameters.AddWithValue("@ReservationEndStayDate", reservation.ReservationEndStayDate);
@@ -197,11 +196,11 @@ namespace EpicAlbergo.Services
                     R.ReservationDate,
                     (R.ReservationPrice - R.ReservationDeposit + COALESCE(SUM(RS.ServicePrice * RS.ServiceQuantity), 0)) AS TotalPrice
                 FROM 
-                    dbo.Reservations AS R
+                    Reservations AS R
                 LEFT JOIN 
-                    dbo.ReservationsServices AS RS ON R.ReservationId = RS.ReservationId
+                    ReservationsServices AS RS ON R.ReservationId = RS.ReservationId
                 LEFT JOIN 
-                    dbo.Services AS S ON RS.ServiceId = S.ServiceId
+                    Services AS S ON RS.ServiceId = S.ServiceId
                 WHERE 
                     R.ReservationId = @ReservationId
                 GROUP BY 
@@ -234,9 +233,9 @@ namespace EpicAlbergo.Services
                     S.ServiceType,
                     RS.ServiceQuantity
                 FROM 
-                    dbo.ReservationsServices AS RS
+                    ReservationsServices AS RS
                 JOIN 
-                    dbo.Services AS S ON RS.ServiceId = S.ServiceId
+                    Services AS S ON RS.ServiceId = S.ServiceId
                 WHERE 
                     RS.ReservationId = @ReservationId";
 

@@ -7,7 +7,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddScoped<UserService>();
+builder.Services.
+    AddScoped<ReservationService>().
+    AddScoped<UserService>();
 
 builder
     .Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
