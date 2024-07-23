@@ -1,0 +1,89 @@
+﻿@model EpicAlbergo.Models.Dto.PersonalDataViewModel
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h1>Register</h1>
+
+<form asp-action="Register" method="post">
+    <div class="form-group">
+        <label asp-for="FirstName"></label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="LastName"></label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Birthday"></label>
+        <input asp-for="Birthday" type="date" class="form-control" />
+        <span asp-validation-for="Birthday" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Gender"></label>
+        <select asp-for="Gender" class="form-control">
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+        </select>
+        <span asp-validation-for="Gender" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="BirthOfCity"></label>
+        <select asp-for="BirthOfCity" class="form-control">
+            <!-- Popola questo select con le città usando JavaScript -->
+        </select>
+        <span asp-validation-for="BirthOfCity" class="text-danger"></span>
+    </div>
+
+    <!-- Campo per il codice fiscale -->
+    <div class="form-group">
+        <label asp-for="CustomerTaxIdCode"></label>
+        <input asp-for="CustomerTaxIdCode" class="form-control" readonly />
+        <span asp-validation-for="CustomerTaxIdCode" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Address"></label>
+        <input asp-for="Address" class="form-control" />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="City"></label>
+        <input asp-for="City" class="form-control" />
+        <span asp-validation-for="City" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ZIPCode"></label>
+        <input asp-for="ZIPCode" class="form-control" />
+        <span asp-validation-for="ZIPCode" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Telephone"></label>
+        <input asp-for="Telephone" class="form-control" />
+        <span asp-validation-for="Telephone" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="HomeTelephone"></label>
+        <input asp-for="HomeTelephone" class="form-control" />
+        <span asp-validation-for="HomeTelephone" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Register</button>
+</form>

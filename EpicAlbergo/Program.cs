@@ -8,8 +8,11 @@ builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.
-    AddScoped<ReservationService>().
-    AddScoped<UserService>();
+    AddScoped<ReservationService>()
+    .AddScoped<CustomerService>()
+    .AddSingleton<FiscalCodeService>()
+    .AddSingleton<CsvCityService>()
+    .AddScoped<UserService>();
 
 builder
     .Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
