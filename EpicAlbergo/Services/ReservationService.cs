@@ -405,8 +405,6 @@ namespace EpicAlbergo.Services
                         }
                     }
                 }
-
-                // Recupera i servizi associati e calcola il totale
                 var serviceQuery = @"
             SELECT 
                 rs.ServiceId, 
