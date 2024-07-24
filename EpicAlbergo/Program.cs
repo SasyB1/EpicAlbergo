@@ -12,6 +12,7 @@ builder.Services.
     .AddScoped<CustomerService>()
     .AddSingleton<FiscalCodeService>()
     .AddSingleton<CsvCityService>()
+    .AddScoped<RoomService>()
     .AddScoped<UserService>();
 
 builder

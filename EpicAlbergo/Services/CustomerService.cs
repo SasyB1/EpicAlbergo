@@ -63,7 +63,7 @@ namespace EpicAlbergo.Services
                         cmd.Parameters.AddWithValue("@CustomerCity", customer.CustomerCity);
                         cmd.Parameters.AddWithValue("@CustomerZIPCode", customer.CustomerZIPCode);
                         cmd.Parameters.AddWithValue("@CustomerEmail", customer.CustomerEmail);
-                        cmd.Parameters.AddWithValue("@CustomerHomeTelephone",customer.CustomerHomeTelephone);
+                        cmd.Parameters.AddWithValue("@CustomerHomeTelephone", customer.CustomerHomeTelephone);
                         cmd.Parameters.AddWithValue("@CustomerTelephone", customer.CustomerTelephone);
                         cmd.Parameters.AddWithValue("@CustomerTaxIdCode", customer.CustomerTaxIdCode);
                         cmd.Parameters.AddWithValue("@CustomerBirthday", customer.CustomerBirthday);
@@ -79,5 +79,51 @@ namespace EpicAlbergo.Services
             }
         }
 
-    }
+        public List<Customer> GetCustomers()
+        {
+            List<Customer> customers = new List<Customer>();
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+                {
+                    conn.Open();
+                    const string SELECT_CUSTOMERS = "SELECT * FROM Customers";
+
+                    using (SqlCommand cmd = new SqlCommand(SELECT_CUSTOMERS, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                Customer customer = new Customer
+                                {
+                                    CustomerId = reader.GetInt32(0),
+                                    CustomerSurname = reader.GetString(1),
+                                    CustomerName = reader.GetString(2),
+                                    CustomerBirthCity = reader.GetString(3),
+                                    CustomerAddress = reader.GetString(4),
+                                    CustomerCity = reader.GetString(5),
+                                    CustomerZIPCode = reader.GetString(6),
+                                    CustomerEmail = reader.GetString(7),
+                                    CustomerHomeTelephone = reader.GetString(8),
+                                    CustomerTelephone = reader.GetString(9),
+                                    CustomerTaxIdCode = reader.GetString(10),
+                                    CustomerBirthday = DateOnly.FromDateTime(reader.GetDateTime(11)),
+                                    Gender = reader.GetString(12)[0]
+                                };
+                                customers.Add(customer);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Errore durante il recupero dei clienti", ex);
+            }
+
+            return customers;
+        }
+    } 
 }

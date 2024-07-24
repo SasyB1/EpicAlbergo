@@ -8,10 +8,14 @@ namespace EpicAlbergo.Controllers
     public class ReservationController : Controller
     {
         private readonly ReservationService _reservationService;
+        private readonly CustomerService _customerService;
+        private readonly RoomService _roomService;
 
-        public ReservationController(ReservationService reservationService)
+        public ReservationController(ReservationService reservationService, CustomerService customerService, RoomService roomService)
         {
             _reservationService = reservationService;
+            _customerService = customerService;
+            _roomService = roomService;
         }
 
         public IActionResult Index()
@@ -21,6 +25,8 @@ namespace EpicAlbergo.Controllers
         public IActionResult RegisterReservation()
         {
             ViewBag.ReservationTypes = Enum.GetValues(typeof(ReservationType)).Cast<ReservationType>();
+            ViewBag.Customers = _customerService.GetCustomers();
+            ViewBag.RoomTypes = new List<string> { "Double", "Single" };
             return View();
         }
 
@@ -35,6 +41,11 @@ namespace EpicAlbergo.Controllers
             return View(reservation);
         }
 
+        public JsonResult GetAvailableRooms(string roomType)
+        {
+            var availableRooms = _roomService.GetAvailableRooms(roomType);
+            return Json(availableRooms);
+        }
         public IActionResult AssociateService()
         {
             ViewBag.ReservationNumber = _reservationService.GetReservationNumber();

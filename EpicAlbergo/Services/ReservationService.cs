@@ -20,14 +20,13 @@ namespace EpicAlbergo.Services
                 {
                     conn.Open();
                     const string INSERT_COMMAND =
-                        "INSERT INTO Reservations (CustomerId, RoomId, ReservationDate, ReservationStartStayDate, ReservationEndStayDate, ReservationDeposit, ReservationPrice, ReservationType) " +
-                        "VALUES (@CustomerId, @RoomId, @ReservationDate, @ReservationStartStayDate, @ReservationEndStayDate, @ReservationDeposit, @ReservationPrice, @ReservationType)";
+                        "INSERT INTO Reservations (CustomerId, RoomId, ReservationStartStayDate, ReservationEndStayDate, ReservationDeposit, ReservationPrice, ReservationType) " +
+                        "VALUES (@CustomerId, @RoomId, @ReservationStartStayDate, @ReservationEndStayDate, @ReservationDeposit, @ReservationPrice, @ReservationType)";
 
                     using (SqlCommand cmd = new SqlCommand(INSERT_COMMAND, conn))
                     {
                         cmd.Parameters.AddWithValue("@CustomerId", reservation.CustomerId);
-                        cmd.Parameters.AddWithValue("@RoomId", reservation.RoomId);
-                        cmd.Parameters.AddWithValue("@ReservationDate", reservation.ReservationDate);
+                        cmd.Parameters.AddWithValue("@RoomId", reservation.RoomId);                     
                         cmd.Parameters.AddWithValue("@ReservationStartStayDate", reservation.ReservationStartStayDate);
                         cmd.Parameters.AddWithValue("@ReservationEndStayDate", reservation.ReservationEndStayDate);
                         cmd.Parameters.AddWithValue("@ReservationDeposit", reservation.ReservationDeposit);
@@ -144,7 +143,7 @@ namespace EpicAlbergo.Services
                 {
                     conn.Open();
                     const string SELECT_COMMAND = @"
-                        SELECT CustomerId, RoomId, ReservationNumber, ReservationDate, ReservationStartStayDate, ReservationEndStayDate, ReservationDeposit, ReservationPrice, ReservationType
+                        SELECT CustomerId, RoomId, ReservationNumber,ReservationStartStayDate, ReservationEndStayDate, ReservationDeposit, ReservationPrice, ReservationType
                         FROM Reservations";
                     using (SqlCommand cmd = new SqlCommand(SELECT_COMMAND, conn))
                     {
@@ -157,7 +156,6 @@ namespace EpicAlbergo.Services
                                     CustomerId = reader.GetInt32(1),
                                     RoomId = reader.GetInt32(2),
                                     ReservationNumber = reader.GetString(3),
-                                    ReservationDate = reader.GetDateTime(4),
                                     ReservationStartStayDate = reader.GetDateTime(5),
                                     ReservationEndStayDate = reader.GetDateTime(6),
                                     ReservationDeposit = reader.GetDecimal(7),

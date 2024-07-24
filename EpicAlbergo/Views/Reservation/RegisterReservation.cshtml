@@ -13,22 +13,36 @@
 
     <div class="form-group">
         <label asp-for="CustomerId" class="control-label"></label>
-        <input asp-for="CustomerId" class="form-control" />
+        <select asp-for="CustomerId" class="form-control">
+            <option value="">Select a customer</option>
+            @foreach (var customer in ViewBag.Customers)
+            {
+                <option value="@customer.CustomerId">@customer.CustomerName @customer.CustomerSurname</option>
+            }
+        </select>
         <span asp-validation-for="CustomerId" class="text-danger"></span>
     </div>
-
+    <div class="form-group">
+        <label asp-for="RoomType" class="control-label"></label>
+        <select asp-for="RoomType" class="form-control" id="roomType">
+            <option value="">Select a room type</option>
+            @if (reservationTypes != null)
+            {
+                @foreach (var type in ViewBag.RoomTypes)
+                {
+                    <option value="@type">@type.ToString()</option>
+                }
+            }
+        </select>
+        <span asp-validation-for="RoomType" class="text-danger"></span>
+    </div>
     <div class="form-group">
         <label asp-for="RoomId" class="control-label"></label>
-        <input asp-for="RoomId" class="form-control" />
+        <select asp-for="RoomId" class="form-control" id="roomSelect">
+            <option value="">Select a room</option>
+        </select>
         <span asp-validation-for="RoomId" class="text-danger"></span>
     </div>
-
-    <div class="form-group">
-        <label asp-for="ReservationDate" class="control-label"></label>
-        <input asp-for="ReservationDate" class="form-control" type="date" />
-        <span asp-validation-for="ReservationDate" class="text-danger"></span>
-    </div>
-
     <div class="form-group">
         <label asp-for="ReservationStartStayDate" class="control-label"></label>
         <input asp-for="ReservationStartStayDate" class="form-control" type="date" />
@@ -81,4 +95,30 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#roomType').change(function () {
+                var roomType = $(this).val();
+                if (roomType) {
+                    $.ajax({
+                        url: '@Url.Action("GetAvailableRooms", "Reservation")',
+                        type: 'GET',
+                        data: { roomType: roomType },
+                        success: function (data) {
+                            var $roomSelect = $('#roomSelect');
+                            $roomSelect.empty();
+                            $roomSelect.append('<option value="">Select a room</option>');
+                            $.each(data, function (index, room) {
+                                $roomSelect.append('<option value="' + room.roomId + '">' + room.roomNumber + '</option>');
+                            });
+                        }
+                    });
+                } else {
+                    $('#roomSelect').empty().append('<option value="">Select a room</option>');
+                }
+            });
+        });
+    </script>
 }
