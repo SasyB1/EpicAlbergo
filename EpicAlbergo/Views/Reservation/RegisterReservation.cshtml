@@ -94,13 +94,44 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
-    <script src="https://ajax.aspnetcdn.com/ajax/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function () {
-            // Carica tutte le stanze quando la pagina è pronta
+            function checkRoomAvailability() {
+                var roomId = $('#roomSelect').val();
+                var startDate = $('#reservationStartStayDate').val();
+                var endDate = $('#reservationEndStayDate').val();
+
+                if (roomId && startDate && endDate) {
+                    $.get('@Url.Action("CheckRoomAvailability")', { roomId: roomId, startDate: startDate, endDate: endDate }, function (isAvailable) {
+                        if (!isAvailable) {
+                            alert('La camera selezionata è già occupata nelle date specificate.');
+                        }
+                    });
+                }
+            }
+
+            function checkCustomerAvailability() {
+                var customerId = $('#customerSelect').val();
+                var startDate = $('#reservationStartStayDate').val();
+                var endDate = $('#reservationEndStayDate').val();
+
+                if (customerId && startDate && endDate) {
+                    $.get('@Url.Action("CheckCustomerAvailability")', { customerId: customerId, startDate: startDate, endDate: endDate }, function (isAvailable) {
+                        if (!isAvailable) {
+                            alert('Il cliente ha già una prenotazione nelle date specificate.');
+                        }
+                    });
+                }
+            }
+
+            $('#roomSelect, #reservationStartStayDate, #reservationEndStayDate').change(function () {
+                checkRoomAvailability();
+                checkCustomerAvailability();
+                updateReservationPrice();
+            });
+
             $.ajax({
-                url: '@Url.Action("GetAvailableRooms", "Reservation")',
+                url: '@Url.Action("GetAllRooms", "Reservation")',
                 type: 'GET',
                 success: function (data) {
                     var $roomSelect = $('#roomSelect');
@@ -109,16 +140,10 @@
                     $.each(data, function (index, room) {
                         $roomSelect.append('<option value="' + room.roomId + '" data-price="' + room.roomPrice + '">' + room.roomNumber + ' - ' + room.roomDescription + '</option>');
                     });
-                    updateReservationPrice(); // Aggiorna il prezzo subito dopo il popolamento delle stanze
+                    updateReservationPrice();
                 }
             });
 
-            // Calcola il prezzo della prenotazione quando cambia la stanza selezionata o le date
-            $('#roomSelect, #reservationStartStayDate, #reservationEndStayDate').change(function () {
-                updateReservationPrice();
-            });
-
-            // Funzione per aggiornare il prezzo della prenotazione
             function updateReservationPrice() {
                 var roomPrice = $('#roomSelect').find(':selected').data('price');
                 var startDate = new Date($('#reservationStartStayDate').val());
@@ -126,14 +151,15 @@
 
                 if (roomPrice && !isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
                     var timeDiff = endDate - startDate;
-                    var daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)); // Converti la differenza di tempo in giorni
+                    var daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
                     var totalPrice = roomPrice * daysDiff;
 
-                    $('#reservationPrice').val(totalPrice.toFixed(2)); // Aggiorna il campo del prezzo
+                    $('#reservationPrice').val(totalPrice.toFixed(2));
                 } else {
-                    $('#reservationPrice').val(''); // Pulisci il campo del prezzo se i dati non sono validi
+                    $('#reservationPrice').val('');
                 }
             }
         });
     </script>
 }
+

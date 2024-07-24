@@ -43,9 +43,71 @@ namespace EpicAlbergo.Services
             }
         }
 
-        public List<ReservationDto> GetReservationNumber()
+        public bool IsRoomAvailable(int roomId, DateTime startDate, DateTime endDate)
         {
-            List<ReservationDto> reservationNumbers = new List<ReservationDto>();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+                {
+                    conn.Open();
+                    const string CHECK_COMMAND = @"
+                SELECT COUNT(*)
+                FROM Reservations
+                WHERE RoomId = @RoomId
+                AND @StartDate < ReservationEndStayDate
+                AND @EndDate > ReservationStartStayDate";
+
+                    using (SqlCommand cmd = new SqlCommand(CHECK_COMMAND, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@RoomId", roomId);
+                        cmd.Parameters.AddWithValue("@StartDate", startDate);
+                        cmd.Parameters.AddWithValue("@EndDate", endDate);
+
+                        int count = (int)cmd.ExecuteScalar();
+                        return count == 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Errore nel controllo della disponibilità della camera: " + ex.Message, ex);
+            }
+        }
+
+        public bool IsCustomerAvailable(int customerId, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+                {
+                    conn.Open();
+                    const string CHECK_COMMAND = @"
+                SELECT COUNT(*)
+                FROM Reservations
+                WHERE CustomerId = @CustomerId
+                AND @StartDate < ReservationEndStayDate
+                AND @EndDate > ReservationStartStayDate";
+
+                    using (SqlCommand cmd = new SqlCommand(CHECK_COMMAND, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@CustomerId", customerId);
+                        cmd.Parameters.AddWithValue("@StartDate", startDate);
+                        cmd.Parameters.AddWithValue("@EndDate", endDate);
+
+                        int count = (int)cmd.ExecuteScalar();
+                        return count == 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Errore nel controllo della disponibilità del cliente: " + ex.Message, ex);
+            }
+        }
+
+        public List<Reservation> GetReservationNumber()
+        {
+            List<Reservation> reservationNumbers = new List<Reservation>();
             try
             {
                 using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
@@ -58,7 +120,7 @@ namespace EpicAlbergo.Services
                         {
                             while (reader.Read())
                             {
-                                ReservationDto reservation = new ReservationDto
+                                Reservation reservation = new Reservation
                                 {
                                     ReservationNumber = reader.GetString(0)
                                 };
@@ -75,39 +137,9 @@ namespace EpicAlbergo.Services
             return reservationNumbers;
         }
 
-        public int GetReservationIdByNumber(string reservationNumber)
-        {
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
-                {
-                    conn.Open();
-                    const string SELECT_COMMAND = "SELECT ReservationId FROM Reservations WHERE ReservationNumber = @ReservationNumber";
-                    using (SqlCommand cmd = new SqlCommand(SELECT_COMMAND, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@ReservationNumber", reservationNumber);
-                        object result = cmd.ExecuteScalar();
-                        if (result != null && int.TryParse(result.ToString(), out int reservationId))
-                        {
-                            return reservationId;
-                        }
-                        else
-                        {
-                            throw new Exception("Prenotazione non trovata.");
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Errore nel recupero dell'ID della prenotazione: " + ex.Message, ex);
-            }
-        }
 
         public void AddServiceToReservation(ServiceReservationDto serviceReservation)
         {
-            int reservationId = GetReservationIdByNumber(serviceReservation.ReservationId.ToString());
-
             try
             {
                 using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
@@ -119,7 +151,7 @@ namespace EpicAlbergo.Services
 
                     using (SqlCommand cmd = new SqlCommand(INSERT_COMMAND, conn))
                     {
-                        cmd.Parameters.AddWithValue("@ReservationId", reservationId);
+                        cmd.Parameters.AddWithValue("@ReservationId", serviceReservation.ReservationId);
                         cmd.Parameters.AddWithValue("@ServiceId", serviceReservation.ServiceId);
                         cmd.Parameters.AddWithValue("@ServiceDate", serviceReservation.ServiceDate);
                         cmd.Parameters.AddWithValue("@ServiceQuantity", serviceReservation.ServiceQuantity);
@@ -135,33 +167,34 @@ namespace EpicAlbergo.Services
             }
         }
 
-        public List<ReservationDto> GetAllReservations()
+        public List<Reservation> GetAllReservations()
         {
-            List<ReservationDto> reservations = new List<ReservationDto>();
+            List<Reservation> reservations = new List<Reservation>();
             try
             {
                 using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
                 {
                     conn.Open();
                     const string SELECT_COMMAND = @"
-                        SELECT CustomerId, RoomId, ReservationNumber,ReservationStartStayDate, ReservationEndStayDate, ReservationDeposit, ReservationPrice, ReservationType
-                        FROM Reservations";
+                SELECT ReservationId, CustomerId, RoomId, ReservationNumber, ReservationStartStayDate, ReservationEndStayDate, ReservationDeposit, ReservationPrice, ReservationType
+                FROM Reservations";
                     using (SqlCommand cmd = new SqlCommand(SELECT_COMMAND, conn))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                ReservationDto reservation = new ReservationDto
+                                Reservation reservation = new Reservation
                                 {
+                                    ReservationId = reader.GetInt32(0), 
                                     CustomerId = reader.GetInt32(1),
                                     RoomId = reader.GetInt32(2),
                                     ReservationNumber = reader.GetString(3),
-                                    ReservationStartStayDate = reader.GetDateTime(5),
-                                    ReservationEndStayDate = reader.GetDateTime(6),
-                                    ReservationDeposit = reader.GetDecimal(7),
-                                    ReservationPrice = reader.GetDecimal(8),
-                                    ReservationType = Enum.Parse<ReservationType>(reader.GetString(9))
+                                    ReservationStartStayDate = reader.GetDateTime(4),
+                                    ReservationEndStayDate = reader.GetDateTime(5),
+                                    ReservationDeposit = reader.GetDecimal(6),
+                                    ReservationPrice = reader.GetDecimal(7),
+                                    ReservationType = Enum.Parse<ReservationType>(reader.GetString(8))
                                 };
                                 reservations.Add(reservation);
                             }
@@ -174,6 +207,39 @@ namespace EpicAlbergo.Services
                 throw new Exception("Errore nel recupero delle prenotazioni: " + ex.Message, ex);
             }
             return reservations;
+        }
+
+        public List<Service> GetAllServices()
+        {
+            List<Service> services = new List<Service>();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+                {
+                    conn.Open();
+                    const string SELECT_COMMAND = "SELECT ServiceId, ServiceType FROM Services";
+                    using (SqlCommand cmd = new SqlCommand(SELECT_COMMAND, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                Service service = new Service
+                                {
+                                    ServiceId = reader.GetInt32(0),
+                                    ServiceType = reader.GetString(1)
+                                };
+                                services.Add(service);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Errore nel recupero dei servizi: " + ex.Message, ex);
+            }
+            return services;
         }
 
         public async Task<CheckoutDto> Checkout(int reservationId)
@@ -264,6 +330,6 @@ namespace EpicAlbergo.Services
                 throw new Exception("Errore nel recupero del checkout: " + ex.Message, ex);
             }
         }
-
+        
     }
 }

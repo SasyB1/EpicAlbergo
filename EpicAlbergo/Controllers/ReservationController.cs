@@ -20,6 +20,7 @@ namespace EpicAlbergo.Controllers
 
         public IActionResult Index()
         {
+            
             return View(_reservationService.GetAllReservations());
         }
         public IActionResult RegisterReservation()
@@ -33,42 +34,77 @@ namespace EpicAlbergo.Controllers
         [HttpPost]
         public IActionResult RegisterReservation(ReservationDto reservation)
         {
-           
-                try
+            if (ModelState.IsValid)
+            {
+                if (!_reservationService.IsRoomAvailable(reservation.RoomId, reservation.ReservationStartStayDate, reservation.ReservationEndStayDate))
                 {
-                    var room = _roomService.GetRoomById(reservation.RoomId);
-                    var roomPrice = room.RoomPrice;
-                    _reservationService.NewReservation(reservation);
+                    ModelState.AddModelError("", "La camera selezionata è già occupata nelle date specificate.");
+                }
+                else if (!_reservationService.IsCustomerAvailable(reservation.CustomerId, reservation.ReservationStartStayDate, reservation.ReservationEndStayDate))
+                {
+                    ModelState.AddModelError("", "Il cliente ha già una prenotazione nelle date specificate.");
+                }
+                else
+                {
+                    try
+                    {
+                        var room = _roomService.GetRoomById(reservation.RoomId);
+                        var roomPrice = room.RoomPrice;
+                        _reservationService.NewReservation(reservation);
+                        return RedirectToAction("Index", "Home");
+                    }
+                    catch (Exception ex)
+                    {
+                        ModelState.AddModelError("", $"Errore nel salvataggio della prenotazione: {ex.Message}");
+                    }
+                }
+            }
+            ViewBag.ReservationTypes = Enum.GetValues(typeof(ReservationType)).Cast<ReservationType>();
+            ViewBag.Customers = _customerService.GetCustomers();
+            ViewBag.Rooms = _roomService.GetAllRooms();
 
-                    return RedirectToAction("Index", "Home");
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", $"Errore nel salvataggio della prenotazione: {ex.Message}");
-                }
             return View(reservation);
         }
 
-        public JsonResult GetAvailableRooms()
+        public JsonResult GetAllRooms()
         {
-            var availableRooms = _roomService.GetAllRooms();
-            return Json(availableRooms);
+            var allRooms = _roomService.GetAllRooms();
+            return Json(allRooms);
         }
-        public IActionResult AssociateService()
+
+
+        public JsonResult CheckRoomAvailability(int roomId, DateTime startDate, DateTime endDate)
         {
-            ViewBag.ReservationNumber = _reservationService.GetReservationNumber();
-            return View();
+            var isAvailable = _reservationService.IsRoomAvailable(roomId, startDate, endDate);
+            return Json(isAvailable);
+        }
+
+
+        public JsonResult CheckCustomerAvailability(int customerId, DateTime startDate, DateTime endDate)
+        {
+            var isAvailable = _reservationService.IsCustomerAvailable(customerId, startDate, endDate);
+            return Json(isAvailable);
+        }
+        public IActionResult AssociateService(int reservationId)
+        {
+            ViewBag.Services = _reservationService.GetAllServices();
+
+            var model = new ServiceReservationDto
+            {
+                ReservationId = reservationId,
+                ServiceDate = DateTime.Now
+            };
+
+            return View(model);
         }
 
         [HttpPost]
-        public IActionResult AssociateService(ServiceReservationDto serviceReservation, string reservationNumber)
+        public IActionResult AssociateService(ServiceReservationDto serviceReservation)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    int reservationId = _reservationService.GetReservationIdByNumber(reservationNumber);
-                    serviceReservation.ReservationId = reservationId;
                     _reservationService.AddServiceToReservation(serviceReservation);
                     return RedirectToAction("Index");
                 }
@@ -81,7 +117,7 @@ namespace EpicAlbergo.Controllers
         }
 
         public async Task<IActionResult> Checkout(int reservationId)
-            {
+        {
             try
             {
                 var checkoutDto = await _reservationService.Checkout(reservationId);
@@ -92,5 +128,6 @@ namespace EpicAlbergo.Controllers
                 return RedirectToAction("Index", new { errorMessage = "Errore durante il checkout: " + ex.Message });
             }
         }
+
     }
 }

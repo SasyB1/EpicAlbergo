@@ -1,41 +1,90 @@
 ﻿
+@model IEnumerable<EpicAlbergo.Models.Reservation>
 
+@{
+    ViewData["Title"] = "Index";
+}
 
-<table>
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
     <thead>
         <tr>
-            <th>CustomerId</th>
-            <th>RoomId</th>
-            <th>ReservationNumber</th>
-            <th>ReservationDate</th>
-            <th>ReservationStartStayDate</th>
-            <th>ReservationEndStayDate</th>
-            <th>ReservationDeposit</th>
-            <th>ReservationPrice</th>
-            <th>ReservationType</th>
-            <th>Action</th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReservationId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CustomerId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RoomId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReservationNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReservationDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReservationStartStayDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReservationEndStayDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReservationDeposit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReservationPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReservationType)
+            </th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var reservation in Model)
-        {
-            <tr>
-                <td>@reservation.CustomerId</td>
-                <td>@reservation.RoomId</td>
-                <td>@reservation.ReservationNumber</td>
-                <td>@reservation.ReservationDate.ToString("yyyy-MM-dd")</td>
-                <td>@reservation.ReservationStartStayDate.ToString("yyyy-MM-dd")</td>
-                <td>@reservation.ReservationEndStayDate.ToString("yyyy-MM-dd")</td>
-                <td>@reservation.ReservationDeposit.ToString("C")</td>
-                <td>@reservation.ReservationPrice.ToString("C")</td>
-                <td>@reservation.ReservationType</td>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReservationId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CustomerId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RoomId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReservationNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReservationDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReservationStartStayDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReservationEndStayDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReservationDeposit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReservationPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReservationType)
+            </td>
                 <td>
-                    <form method="get" action="@Url.Action("Checkout", "YourControllerName")">
-                        <input type="hidden" name="reservationId" value="@reservation.ReservationId" />
-                        <button type="submit" class="btn btn-primary">Checkout</button>
-                    </form>
+                    @Html.ActionLink("Associate Service", "AssociateService", new { reservationId = item.ReservationId })
+
                 </td>
-            </tr>
-        }
+                
+        </tr>
+}
     </tbody>
 </table>
