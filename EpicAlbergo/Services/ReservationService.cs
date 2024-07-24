@@ -26,12 +26,13 @@ namespace EpicAlbergo.Services
                     using (SqlCommand cmd = new SqlCommand(INSERT_COMMAND, conn))
                     {
                         cmd.Parameters.AddWithValue("@CustomerId", reservation.CustomerId);
-                        cmd.Parameters.AddWithValue("@RoomId", reservation.RoomId);                     
+                        cmd.Parameters.AddWithValue("@RoomId", reservation.RoomId);
                         cmd.Parameters.AddWithValue("@ReservationStartStayDate", reservation.ReservationStartStayDate);
                         cmd.Parameters.AddWithValue("@ReservationEndStayDate", reservation.ReservationEndStayDate);
                         cmd.Parameters.AddWithValue("@ReservationDeposit", reservation.ReservationDeposit);
                         cmd.Parameters.AddWithValue("@ReservationPrice", reservation.ReservationPrice);
                         cmd.Parameters.AddWithValue("@ReservationType", reservation.ReservationType.ToString());
+
                         cmd.ExecuteNonQuery();
                     }
                 }

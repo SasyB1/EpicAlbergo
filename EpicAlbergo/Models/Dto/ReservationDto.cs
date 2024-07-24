@@ -16,6 +16,5 @@
         public decimal ReservationDeposit { get; set; }
         public decimal ReservationPrice { get; set; }
         public ReservationType ReservationType { get; set; }
-        public string RoomType { get; set; }
     }
 }

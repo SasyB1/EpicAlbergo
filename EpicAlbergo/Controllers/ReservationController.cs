@@ -35,15 +35,28 @@ namespace EpicAlbergo.Controllers
         {
             if (ModelState.IsValid)
             {
-                _reservationService.NewReservation(reservation);
-                return RedirectToAction("Index");
+                try
+                {
+                    var room = _roomService.GetRoomById(reservation.RoomId);
+                    var roomPrice = room.RoomPrice;
+                    // Salva la prenotazione con il prezzo già calcolato dal client
+                    _reservationService.NewReservation(reservation);
+
+                    // Reindirizza alla pagina Index della HomeController
+                    return RedirectToAction("Index", "Home");
+                }
+                catch (Exception ex)
+                {
+                    // Aggiungi un messaggio di errore e ritorna alla vista
+                    ModelState.AddModelError("", $"Errore nel salvataggio della prenotazione: {ex.Message}");
+                }
             }
             return View(reservation);
         }
 
-        public JsonResult GetAvailableRooms(string roomType)
+        public JsonResult GetAvailableRooms()
         {
-            var availableRooms = _roomService.GetAvailableRooms(roomType);
+            var availableRooms = _roomService.GetAllRooms();
             return Json(availableRooms);
         }
         public IActionResult AssociateService()

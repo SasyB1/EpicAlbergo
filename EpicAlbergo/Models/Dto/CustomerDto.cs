@@ -4,6 +4,7 @@ namespace EpicAlbergo.Models.Dto
 {
     public class CustomerDto
     {
+        public int CustomerId { get; set; }
         [Display(Name = "Nome")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Immettere il nome")]
         [StringLength(50, MinimumLength = 2, ErrorMessage = "Il nome deve contenere almeno 2 caratteri e non più di 50")]

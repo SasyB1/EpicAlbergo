@@ -13,29 +13,23 @@
 
     <div class="form-group">
         <label asp-for="CustomerId" class="control-label"></label>
-        <select asp-for="CustomerId" class="form-control">
+        <select asp-for="CustomerId" class="form-control" id="customerSelect">
             <option value="">Select a customer</option>
-            @foreach (var customer in ViewBag.Customers)
+            @if (ViewBag.Customers != null)
             {
-                <option value="@customer.CustomerId">@customer.CustomerName @customer.CustomerSurname</option>
+                foreach (var customer in ViewBag.Customers)
+                {
+                    <option value="@customer.CustomerId">@customer.CustomerName @customer.CustomerSurname</option>
+                }
+            }
+            else
+            {
+                <option value="">No customers available</option>
             }
         </select>
         <span asp-validation-for="CustomerId" class="text-danger"></span>
     </div>
-    <div class="form-group">
-        <label asp-for="RoomType" class="control-label"></label>
-        <select asp-for="RoomType" class="form-control" id="roomType">
-            <option value="">Select a room type</option>
-            @if (reservationTypes != null)
-            {
-                @foreach (var type in ViewBag.RoomTypes)
-                {
-                    <option value="@type">@type.ToString()</option>
-                }
-            }
-        </select>
-        <span asp-validation-for="RoomType" class="text-danger"></span>
-    </div>
+
     <div class="form-group">
         <label asp-for="RoomId" class="control-label"></label>
         <select asp-for="RoomId" class="form-control" id="roomSelect">
@@ -43,15 +37,16 @@
         </select>
         <span asp-validation-for="RoomId" class="text-danger"></span>
     </div>
+
     <div class="form-group">
         <label asp-for="ReservationStartStayDate" class="control-label"></label>
-        <input asp-for="ReservationStartStayDate" class="form-control" type="date" />
+        <input asp-for="ReservationStartStayDate" class="form-control" type="date" id="reservationStartStayDate" />
         <span asp-validation-for="ReservationStartStayDate" class="text-danger"></span>
     </div>
 
     <div class="form-group">
         <label asp-for="ReservationEndStayDate" class="control-label"></label>
-        <input asp-for="ReservationEndStayDate" class="form-control" type="date" />
+        <input asp-for="ReservationEndStayDate" class="form-control" type="date" id="reservationEndStayDate" />
         <span asp-validation-for="ReservationEndStayDate" class="text-danger"></span>
     </div>
 
@@ -63,32 +58,29 @@
 
     <div class="form-group">
         <label asp-for="ReservationPrice" class="control-label"></label>
-        <input asp-for="ReservationPrice" class="form-control" type="number" step="0.01" />
+        <input asp-for="ReservationPrice" class="form-control" type="number" id="reservationPrice" step="0.01" readonly />
         <span asp-validation-for="ReservationPrice" class="text-danger"></span>
     </div>
 
     <div class="form-group">
         <label asp-for="ReservationType" class="control-label"></label>
         <select asp-for="ReservationType" class="form-control">
-            <option value="">Seleziona un tipo di prenotazione</option>
-            @if (reservationTypes != null)
+            <option value="">Select a reservation type</option>
+            @foreach (var type in ViewBag.ReservationTypes)
             {
-                @foreach (var type in reservationTypes)
-                {
-                    <option value="@type">@type.ToString()</option>
-                }
+                <option value="@type">@type</option>
             }
         </select>
         <span asp-validation-for="ReservationType" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <input type="submit" value="Registra" class="btn btn-primary" />
+        <input type="submit" value="Register" class="btn btn-primary" />
     </div>
 </form>
 
 <div>
-    <a asp-action="Index">Torna alla lista delle prenotazioni</a>
+    <a asp-action="Index">Back to reservations list</a>
 </div>
 
 @section Scripts {
@@ -99,28 +91,42 @@
     <script src="https://ajax.aspnetcdn.com/ajax/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function () {
-            $('#roomType').change(function () {
-                var roomType = $(this).val();
-                if (roomType) {
-                    $.ajax({
-                        url: '@Url.Action("GetAvailableRooms", "Reservation")',
-                        type: 'GET',
-                        data: { roomType: roomType },
-                        success: function (data) {
-                            var $roomSelect = $('#roomSelect');
-                            $roomSelect.empty();
-                            $roomSelect.append('<option value="">Select a room</option>');
-                            $.each(data, function (index, room) {
-                                // Mostra sia RoomNumber che RoomDescription
-                                $roomSelect.append('<option value="' + room.roomId + '">' + room.roomNumber + ' - ' + room.roomDescription + '</option>');
-                            });
-                        }
+            // Carica tutte le stanze quando la pagina è pronta
+            $.ajax({
+                url: '@Url.Action("GetAvailableRooms", "Reservation")',
+                type: 'GET',
+                success: function (data) {
+                    var $roomSelect = $('#roomSelect');
+                    $roomSelect.empty();
+                    $roomSelect.append('<option value="">Select a room</option>');
+                    $.each(data, function (index, room) {
+                        $roomSelect.append('<option value="' + room.roomId + '" data-price="' + room.roomPrice + '">' + room.roomNumber + ' - ' + room.roomDescription + '</option>');
                     });
-                } else {
-                    $('#roomSelect').empty().append('<option value="">Select a room</option>');
+                    updateReservationPrice(); // Aggiorna il prezzo subito dopo il popolamento delle stanze
                 }
             });
+
+            // Calcola il prezzo della prenotazione quando cambia la stanza selezionata o le date
+            $('#roomSelect, #reservationStartStayDate, #reservationEndStayDate').change(function () {
+                updateReservationPrice();
+            });
+
+            // Funzione per aggiornare il prezzo della prenotazione
+            function updateReservationPrice() {
+                var roomPrice = $('#roomSelect').find(':selected').data('price');
+                var startDate = new Date($('#reservationStartStayDate').val());
+                var endDate = new Date($('#reservationEndStayDate').val());
+
+                if (roomPrice && !isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+                    var timeDiff = endDate - startDate;
+                    var daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)); // Converti la differenza di tempo in giorni
+                    var totalPrice = roomPrice * daysDiff;
+
+                    $('#reservationPrice').val(totalPrice.toFixed(2)); // Aggiorna il campo del prezzo
+                } else {
+                    $('#reservationPrice').val(''); // Pulisci il campo del prezzo se i dati non sono validi
+                }
+            }
         });
     </script>
-
 }

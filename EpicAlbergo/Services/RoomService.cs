@@ -13,7 +13,7 @@ namespace EpicAlbergo.Services
             _config = config;
         }
 
-        public List<RoomDto> GetAvailableRooms(string roomType)
+        public List<RoomDto> GetAllRooms()
         {
             var rooms = new List<RoomDto>();
 
@@ -22,15 +22,12 @@ namespace EpicAlbergo.Services
                 using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
                 {
                     conn.Open();
-                    const string SELECT_AVAILABLE_ROOMS = @"
-                SELECT RoomId, RoomNumber,RoomDescription
-                FROM Rooms
-                WHERE RoomType = @RoomType";
-                    using (SqlCommand cmd = new SqlCommand(SELECT_AVAILABLE_ROOMS, conn))
-                    {
-                        // Aggiunta del parametro
-                        cmd.Parameters.Add(new SqlParameter("@RoomType", SqlDbType.NVarChar) { Value = roomType });
+                    const string SELECT_ALL_ROOMS = @"
+            SELECT RoomId, RoomNumber, RoomDescription, RoomPrice
+            FROM Rooms";
 
+                    using (SqlCommand cmd = new SqlCommand(SELECT_ALL_ROOMS, conn))
+                    {
                         // Esecuzione della query
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -41,7 +38,8 @@ namespace EpicAlbergo.Services
                                 {
                                     RoomId = reader.GetInt32(0),
                                     RoomNumber = reader.GetInt32(1),
-                                    RoomDescription = reader.GetString(2)
+                                    RoomDescription = reader.GetString(2),
+                                    RoomPrice = reader.GetDecimal(3)
                                 };
 
                                 rooms.Add(room);
@@ -52,11 +50,48 @@ namespace EpicAlbergo.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Errore nel recupero delle camere", ex);
+                throw new Exception("Errore nel recupero delle stanze", ex);
             }
 
             return rooms;
         }
 
+        public RoomDto GetRoomById(int roomId)
+        {
+            RoomDto room = null;
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+                {
+                    conn.Open();
+                    const string SELECT_ROOM_BY_ID = @"
+                SELECT RoomId, RoomNumber, RoomDescription, RoomPrice
+                FROM Rooms
+                WHERE RoomId = @RoomId";
+                    using (SqlCommand cmd = new SqlCommand(SELECT_ROOM_BY_ID, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@RoomId", roomId);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                room = new RoomDto
+                                {
+                                    RoomId = reader.GetInt32(0),
+                                    RoomNumber = reader.GetInt32(1),
+                                    RoomDescription = reader.GetString(2),
+                                    RoomPrice = reader.GetDecimal(3)
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Errore nel recupero della camera", ex);
+            }
+            return room;
+        }
     }
 }
