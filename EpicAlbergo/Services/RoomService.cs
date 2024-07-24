@@ -28,10 +28,8 @@ namespace EpicAlbergo.Services
 
                     using (SqlCommand cmd = new SqlCommand(SELECT_ALL_ROOMS, conn))
                     {
-                        // Esecuzione della query
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            // Lettura dei dati
                             while (reader.Read())
                             {
                                 var room = new RoomDto
