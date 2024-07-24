@@ -39,18 +39,17 @@ namespace EpicAlbergo.Controllers
                 {
                     var room = _roomService.GetRoomById(reservation.RoomId);
                     var roomPrice = room.RoomPrice;
-                    // Salva la prenotazione con il prezzo già calcolato dal client
                     _reservationService.NewReservation(reservation);
 
-                    // Reindirizza alla pagina Index della HomeController
                     return RedirectToAction("Index", "Home");
                 }
                 catch (Exception ex)
                 {
-                    // Aggiungi un messaggio di errore e ritorna alla vista
                     ModelState.AddModelError("", $"Errore nel salvataggio della prenotazione: {ex.Message}");
                 }
             }
+
+            // Se il modello non è valido, torna alla vista con i messaggi di errore
             return View(reservation);
         }
 

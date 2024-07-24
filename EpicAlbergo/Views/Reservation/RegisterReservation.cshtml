@@ -66,9 +66,16 @@
         <label asp-for="ReservationType" class="control-label"></label>
         <select asp-for="ReservationType" class="form-control">
             <option value="">Select a reservation type</option>
-            @foreach (var type in ViewBag.ReservationTypes)
+            @if (ViewBag.ReservationTypes != null)
             {
-                <option value="@type">@type</option>
+                @foreach (var type in ViewBag.ReservationTypes)
+                {
+                    <option value="@type.ToString()">@type.ToString()</option>
+                }
+            }
+            else
+            {
+                <option value="">No reservation types available</option>
             }
         </select>
         <span asp-validation-for="ReservationType" class="text-danger"></span>
