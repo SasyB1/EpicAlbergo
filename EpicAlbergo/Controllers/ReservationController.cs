@@ -33,8 +33,7 @@ namespace EpicAlbergo.Controllers
         [HttpPost]
         public IActionResult RegisterReservation(ReservationDto reservation)
         {
-            if (ModelState.IsValid)
-            {
+           
                 try
                 {
                     var room = _roomService.GetRoomById(reservation.RoomId);
@@ -47,9 +46,6 @@ namespace EpicAlbergo.Controllers
                 {
                     ModelState.AddModelError("", $"Errore nel salvataggio della prenotazione: {ex.Message}");
                 }
-            }
-
-            // Se il modello non è valido, torna alla vista con i messaggi di errore
             return View(reservation);
         }
 
