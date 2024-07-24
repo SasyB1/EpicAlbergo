@@ -125,10 +125,7 @@ namespace EpicAlbergo.Controllers
 
         public async Task<IActionResult> Checkout(int reservationId)
         {
-            // Recupera i dati per il checkout
             var checkoutDto = await _reservationService.GetCheckoutViewModelAsync(reservationId);
-
-            // Passa i dati alla vista
             return View(checkoutDto);
         }
 

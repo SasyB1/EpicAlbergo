@@ -445,7 +445,7 @@ namespace EpicAlbergo.Services
                             totalPrice += dto.ServiceQuantity * dto.ServicePrice;
                         }
 
-                        model.TotalPrice = totalPrice;
+                        model.TotalPrice = totalPrice - model.Reservation.ReservationDeposit;
                     }
                 }
             }
