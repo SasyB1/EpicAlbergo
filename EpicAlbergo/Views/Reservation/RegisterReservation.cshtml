@@ -111,7 +111,8 @@
                             $roomSelect.empty();
                             $roomSelect.append('<option value="">Select a room</option>');
                             $.each(data, function (index, room) {
-                                $roomSelect.append('<option value="' + room.roomId + '">' + room.roomNumber + '</option>');
+                                // Mostra sia RoomNumber che RoomDescription
+                                $roomSelect.append('<option value="' + room.roomId + '">' + room.roomNumber + ' - ' + room.roomDescription + '</option>');
                             });
                         }
                     });
@@ -121,4 +122,5 @@
             });
         });
     </script>
+
 }

@@ -23,7 +23,7 @@ namespace EpicAlbergo.Services
                 {
                     conn.Open();
                     const string SELECT_AVAILABLE_ROOMS = @"
-                SELECT RoomId, RoomNumber
+                SELECT RoomId, RoomNumber,RoomDescription
                 FROM Rooms
                 WHERE RoomType = @RoomType";
                     using (SqlCommand cmd = new SqlCommand(SELECT_AVAILABLE_ROOMS, conn))
@@ -40,7 +40,8 @@ namespace EpicAlbergo.Services
                                 var room = new RoomDto
                                 {
                                     RoomId = reader.GetInt32(0),
-                                    RoomNumber = reader.GetInt32(1)
+                                    RoomNumber = reader.GetInt32(1),
+                                    RoomDescription = reader.GetString(2)
                                 };
 
                                 rooms.Add(room);
