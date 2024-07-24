@@ -2,7 +2,7 @@
 
 namespace EpicAlbergo.Models.Dto
 {
-    public class FiscalCodeViewModel
+    public class FiscalCodeDto
     {
         [Display(Name = "Nome")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Immettere il nome")]

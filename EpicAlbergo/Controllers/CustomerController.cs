@@ -44,7 +44,7 @@ namespace EpicAlbergo.Controllers
       
 
         [HttpPost]
-        public IActionResult FiscalCode(FiscalCodeViewModel model)
+        public IActionResult FiscalCode(FiscalCodeDto model)
         {
             if (ModelState.IsValid)
             {
@@ -83,7 +83,7 @@ namespace EpicAlbergo.Controllers
 
         public IActionResult Register()
         {
-            var model = new PersonalDataViewModel();
+            var model = new CustomerDto();
             if (TempData["CustomerData"] != null)
             {
                 var customerDataJson = TempData["CustomerData"].ToString();
@@ -101,7 +101,7 @@ namespace EpicAlbergo.Controllers
 
 
         [HttpPost]
-        public IActionResult Register(PersonalDataViewModel model)
+        public IActionResult Register(CustomerDto model)
         {
             if (ModelState.IsValid)
             {

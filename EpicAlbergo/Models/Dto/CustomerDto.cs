@@ -2,7 +2,7 @@
 
 namespace EpicAlbergo.Models.Dto
 {
-    public class PersonalDataViewModel
+    public class CustomerDto
     {
         [Display(Name = "Nome")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "Immettere il nome")]
