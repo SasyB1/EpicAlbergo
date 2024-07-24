@@ -4,18 +4,20 @@
     ViewBag.Title = "Associate Service to Reservation";
 }
 
-<h1>Associate Service to Reservation</h1>
+<h1>@ViewBag.Title</h1>
 
-<form asp-action="AssociateService" method="post">
+<form id="associateServiceForm" asp-action="AssociateService" method="post">
+    <!-- Riepilogo degli errori del modello -->
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
     <div class="form-group">
         <label for="reservationId">Reservation ID</label>
-        <!-- Campo di testo che mostra il ReservationId -->
         <input type="text" id="reservationId" name="ReservationId" class="form-control" value="@Model.ReservationId" readonly />
-
     </div>
+
     <div class="form-group">
         <label asp-for="ServiceId" class="control-label"></label>
-        <select asp-for="ServiceId" class="form-control">
+        <select asp-for="ServiceId" class="form-control" id="serviceSelect">
             <option value="">Select a Service</option>
             @if (ViewBag.Services != null)
             {
@@ -29,30 +31,64 @@
                 <option value="">No Services Available</option>
             }
         </select>
-        <span asp-validation-for="ServiceId" class="text-danger"></span>
+        <span asp-validation-for="ServiceId" class="text-danger" id="serviceError"></span>
     </div>
+
     <div class="form-group">
         <label asp-for="ServiceDate" class="control-label"></label>
         <input asp-for="ServiceDate" class="form-control" />
         <span asp-validation-for="ServiceDate" class="text-danger"></span>
     </div>
+
     <div class="form-group">
         <label asp-for="ServiceQuantity" class="control-label"></label>
         <input asp-for="ServiceQuantity" class="form-control" />
         <span asp-validation-for="ServiceQuantity" class="text-danger"></span>
     </div>
+
     <div class="form-group">
         <label asp-for="ServicePrice" class="control-label"></label>
         <input asp-for="ServicePrice" class="form-control" />
         <span asp-validation-for="ServicePrice" class="text-danger"></span>
     </div>
+
     <div class="form-group">
         <input type="submit" value="Add Service" class="btn btn-primary" />
     </div>
 </form>
 
+<div>
+    <a asp-action="Index">Back to reservations list</a>
+</div>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        $(document).ready(function () {
+            function checkServiceAssociation() {
+                var reservationId = $('#reservationId').val();
+                var serviceId = $('#serviceSelect').val();
+
+                if (reservationId && serviceId) {
+                    $.getJSON('@Url.Action("IsServiceAlreadyAssociated")', { reservationId: reservationId, serviceId: serviceId }, function (isAvailable) {
+                        if (!isAvailable) {
+                            $('#serviceError').text('Il servizio è già associato a questa prenotazione.');
+                            $('#associateServiceForm').find('input[type="submit"]').prop('disabled', true);
+                        } else {
+                            $('#serviceError').text('');
+                            $('#associateServiceForm').find('input[type="submit"]').prop('disabled', false);
+                        }
+                    });
+                } else {
+                    $('#serviceError').text('');
+                    $('#associateServiceForm').find('input[type="submit"]').prop('disabled', false);
+                }
+            }
+            $('#serviceSelect').change(function () {
+                checkServiceAssociation();
+            });
+        });
+    </script>
 }

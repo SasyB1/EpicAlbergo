@@ -1,1 +1,42 @@
-﻿
+﻿@model EpicAlbergo.Models.Dto.CheckoutDto
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<h1>Checkout</h1>
+
+<h2>Reservation Details</h2>
+<p>Reservation Number: @Model.Reservation.ReservationNumber</p>
+<p>Reservation Date: @Model.Reservation.ReservationDate.ToShortDateString()</p>
+<p>Start Stay Date: @Model.Reservation.ReservationStartStayDate.ToShortDateString()</p>
+<p>End Stay Date: @Model.Reservation.ReservationEndStayDate.ToShortDateString()</p>
+<p>Deposit: @Model.Reservation.ReservationDeposit.ToString("C")</p>
+<p>Price: @Model.Reservation.ReservationPrice.ToString("C")</p>
+<p>Room Number: @Model.Room.RoomNumber</p>
+
+<h2>Services</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Service Type</th>
+            <th>Date</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var service in Model.ReservationServices)
+        {
+            <tr>
+                <td>@service.ServiceDate.ToShortDateString()</td>
+                <td>@service.ServiceQuantity</td>
+                <td>@service.ServicePrice.ToString("C")</td>
+                <td>@(service.ServiceQuantity * service.ServicePrice).ToString("C")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h3>Total Price: @Model.TotalPrice.ToString("C")</h3>

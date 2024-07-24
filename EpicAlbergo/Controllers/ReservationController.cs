@@ -11,6 +11,7 @@ namespace EpicAlbergo.Controllers
         private readonly CustomerService _customerService;
         private readonly RoomService _roomService;
 
+
         public ReservationController(ReservationService reservationService, CustomerService customerService, RoomService roomService)
         {
             _reservationService = reservationService;
@@ -116,17 +117,19 @@ namespace EpicAlbergo.Controllers
             return View(serviceReservation);
         }
 
+        public JsonResult IsServiceAlreadyAssociated(int reservationId, int serviceId)
+        {
+            bool isAssociated = _reservationService.IsServiceAlreadyAssociated(reservationId, serviceId);
+            return Json(!isAssociated); 
+        }
+
         public async Task<IActionResult> Checkout(int reservationId)
         {
-            try
-            {
-                var checkoutDto = await _reservationService.Checkout(reservationId);
-                return View("Checkout");
-            }
-            catch (Exception ex)
-            {
-                return RedirectToAction("Index", new { errorMessage = "Errore durante il checkout: " + ex.Message });
-            }
+            // Recupera i dati per il checkout
+            var checkoutDto = await _reservationService.GetCheckoutViewModelAsync(reservationId);
+
+            // Passa i dati alla vista
+            return View(checkoutDto);
         }
 
     }

@@ -242,94 +242,218 @@ namespace EpicAlbergo.Services
             return services;
         }
 
-        public async Task<CheckoutDto> Checkout(int reservationId)
+        public bool IsServiceAlreadyAssociated(int reservationId, int serviceId)
         {
             try
             {
-                var checkout = new CheckoutDto
-                {
-                    Services = new List<Service>()
-                };
-
                 using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
                 {
-                    await conn.OpenAsync();
+                    conn.Open();
+                    const string CHECK_COMMAND = @"
+                SELECT COUNT(*)
+                FROM ReservationsServices
+                WHERE ReservationId = @ReservationId
+                AND ServiceId = @ServiceId";
 
-                    const string SELECT_COMMAND = @"
-                SELECT 
-                    R.ReservationNumber,
-                    R.ReservationDate,
-                    (R.ReservationPrice - R.ReservationDeposit + COALESCE(SUM(RS.ServicePrice * RS.ServiceQuantity), 0)) AS TotalPrice
-                FROM 
-                    Reservations AS R
-                LEFT JOIN 
-                    ReservationsServices AS RS ON R.ReservationId = RS.ReservationId
-                LEFT JOIN 
-                    Services AS S ON RS.ServiceId = S.ServiceId
-                WHERE 
-                    R.ReservationId = @ReservationId
-                GROUP BY 
-                    R.ReservationNumber, 
-                    R.ReservationDate, 
-                    R.ReservationPrice, 
-                    R.ReservationDeposit";
-
-                    using (var cmd = new SqlCommand(SELECT_COMMAND, conn))
+                    using (SqlCommand cmd = new SqlCommand(CHECK_COMMAND, conn))
                     {
                         cmd.Parameters.AddWithValue("@ReservationId", reservationId);
+                        cmd.Parameters.AddWithValue("@ServiceId", serviceId);
 
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            if (await reader.ReadAsync())
-                            {
-                                checkout.ReservationNumber = reader.GetString(0);
-                                checkout.ReservationDate = reader.GetDateTime(1);
-                                checkout.TotalPrice = reader.GetDecimal(2);
-                            }
-                            else
-                            {
-                                throw new Exception("Prenotazione non trovata.");
-                            }
-                        }
+                        int count = (int)cmd.ExecuteScalar();
+                        return count > 0; 
                     }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Errore nel controllo della presenza del servizio: " + ex.Message, ex);
+            }
+        }
 
-                    const string SELECT_SERVICES_COMMAND = @"
-                SELECT 
-                    S.ServiceType,
-                    RS.ServiceQuantity
-                FROM 
-                    ReservationsServices AS RS
-                JOIN 
-                    Services AS S ON RS.ServiceId = S.ServiceId
-                WHERE 
-                    RS.ReservationId = @ReservationId";
-
-                    using (var cmdServices = new SqlCommand(SELECT_SERVICES_COMMAND, conn))
+        public Reservation GetReservationById(int reservationId)
+        {
+            Reservation reservation = null;
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+                {
+                    conn.Open();
+                    const string SELECT_COMMAND = "SELECT * FROM Reservations WHERE ReservationId = @ReservationId";
+                    using (SqlCommand cmd = new SqlCommand(SELECT_COMMAND, conn))
                     {
-                        cmdServices.Parameters.AddWithValue("@ReservationId", reservationId);
-
-                        using (var readerServices = await cmdServices.ExecuteReaderAsync())
+                        cmd.Parameters.AddWithValue("@ReservationId", reservationId);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
                         {
-                            while (await readerServices.ReadAsync())
+                            if (reader.Read())
                             {
-                                var service = new Service
+                                reservation = new Reservation
                                 {
-                                    ServiceType = readerServices.GetString(0)
+                                    ReservationId = reader.GetInt32(reader.GetOrdinal("ReservationId")),
+                                    CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                    RoomId = reader.GetInt32(reader.GetOrdinal("RoomId")),
+                                    ReservationNumber = reader.GetString(reader.GetOrdinal("ReservationNumber")),
+                                    ReservationStartStayDate = reader.GetDateTime(reader.GetOrdinal("ReservationStartStayDate")),
+                                    ReservationEndStayDate = reader.GetDateTime(reader.GetOrdinal("ReservationEndStayDate")),
+                                    ReservationDeposit = reader.GetDecimal(reader.GetOrdinal("ReservationDeposit")),
+                                    ReservationPrice = reader.GetDecimal(reader.GetOrdinal("ReservationPrice")),
+                                    ReservationType = (ReservationType)reader.GetInt32(reader.GetOrdinal("ReservationType"))
                                 };
-                                checkout.Services.Add(service);
                             }
                         }
                     }
                 }
-
-                return checkout;
             }
             catch (Exception ex)
             {
-                // Opzionalmente, puoi loggare l'eccezione qui
-                throw new Exception("Errore nel recupero del checkout: " + ex.Message, ex);
+                throw new Exception("Errore nel recupero della prenotazione: " + ex.Message, ex);
             }
+            return reservation;
         }
-        
+
+        public List<ServiceReservationDto> GetServicesByReservationId(int reservationId)
+        {
+            var serviceDtos = new List<ServiceReservationDto>();
+
+            var query = @"
+        SELECT 
+            rs.ReservationId,
+            rs.ServiceId,
+            rs.ServiceDate,
+            rs.ServiceQuantity,
+            rs.ServicePrice,
+            s.ServiceType
+        FROM 
+            ReservationsServices rs
+        INNER JOIN 
+            Services s ON rs.ServiceId = s.ServiceId
+        WHERE 
+            rs.ReservationId = @ReservationId";
+
+            using (var conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+            {
+                using (var cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ReservationId", reservationId);
+                    conn.Open();
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var dto = new ServiceReservationDto
+                            {
+                                ReservationId = reader.GetInt32(reader.GetOrdinal("ReservationId")),
+                                ServiceId = reader.GetInt32(reader.GetOrdinal("ServiceId")),
+                                ServiceDate = reader.GetDateTime(reader.GetOrdinal("ServiceDate")),
+                                ServiceQuantity = reader.GetInt32(reader.GetOrdinal("ServiceQuantity")),
+                                ServicePrice = reader.GetDecimal(reader.GetOrdinal("ServicePrice")),
+                                // Nota: Aggiungi ServiceType se necessario per altre operazioni
+                            };
+                            serviceDtos.Add(dto);
+                        }
+                    }
+                }
+            }
+
+            return serviceDtos;
+        }
+
+        public async Task<CheckoutDto> GetCheckoutViewModelAsync(int reservationId)
+        {
+            var model = new CheckoutDto
+            {
+                ReservationServices = new List<ServiceAllCheckoutDto>()  
+            };
+
+            var connectionString = _config.GetConnectionString("DefaultConnection");
+
+            using (var conn = new SqlConnection(connectionString))
+            {
+                await conn.OpenAsync();
+                var reservationQuery = @"
+            SELECT r.*, rm.RoomNumber 
+            FROM Reservations r 
+            JOIN Rooms rm ON r.RoomId = rm.RoomId 
+            WHERE r.ReservationId = @ReservationId";
+
+                using (var cmd = new SqlCommand(reservationQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ReservationId", reservationId);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            model.Reservation = new Reservation
+                            {
+                                ReservationId = reader.GetInt32(reader.GetOrdinal("ReservationId")),
+                                ReservationNumber = reader.GetString(reader.GetOrdinal("ReservationNumber")),
+                                ReservationDate = reader.GetDateTime(reader.GetOrdinal("ReservationDate")),
+                                ReservationStartStayDate = reader.GetDateTime(reader.GetOrdinal("ReservationStartStayDate")),
+                                ReservationEndStayDate = reader.GetDateTime(reader.GetOrdinal("ReservationEndStayDate")),
+                                ReservationDeposit = reader.GetDecimal(reader.GetOrdinal("ReservationDeposit")),
+                                ReservationPrice = reader.GetDecimal(reader.GetOrdinal("ReservationPrice")),
+                                RoomId = reader.GetInt32(reader.GetOrdinal("RoomId"))
+                            };
+
+                            model.Room = new Room
+                            {
+                                RoomId = reader.GetInt32(reader.GetOrdinal("RoomId")),
+                                RoomNumber = reader.GetInt32(reader.GetOrdinal("RoomNumber"))
+                            };
+                        }
+                    }
+                }
+
+                // Recupera i servizi associati e calcola il totale
+                var serviceQuery = @"
+            SELECT 
+                rs.ServiceId, 
+                rs.ServiceDate, 
+                rs.ServiceQuantity, 
+                rs.ServicePrice, 
+                s.ServiceType 
+            FROM 
+                ReservationsServices rs 
+            INNER JOIN 
+                Services s ON rs.ServiceId = s.ServiceId 
+            WHERE 
+                rs.ReservationId = @ReservationId";
+
+                using (var cmd = new SqlCommand(serviceQuery, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ReservationId", reservationId);
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        decimal totalPrice = model.Reservation.ReservationPrice;
+
+                        while (await reader.ReadAsync())
+                        {
+                            var dto = new ServiceAllCheckoutDto
+                            {
+                                ReservationId = reservationId,
+                                ServiceId = reader.GetInt32(reader.GetOrdinal("ServiceId")),
+                                ServiceDate = reader.GetDateTime(reader.GetOrdinal("ServiceDate")),
+                                ServiceQuantity = reader.GetInt32(reader.GetOrdinal("ServiceQuantity")),
+                                ServicePrice = reader.GetDecimal(reader.GetOrdinal("ServicePrice")),
+                                ServiceType = reader.GetString(reader.GetOrdinal("ServiceType"))
+                            };
+
+                            model.ReservationServices.Add(dto);
+                            totalPrice += dto.ServiceQuantity * dto.ServicePrice;
+                        }
+
+                        model.TotalPrice = totalPrice;
+                    }
+                }
+            }
+
+            return model;
+        }
+
+
+
     }
 }
