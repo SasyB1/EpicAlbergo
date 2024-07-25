@@ -4,60 +4,67 @@
     ViewData["Title"] = "Calcolo del Codice Fiscale";
 }
 
-<h1>@ViewData["Title"]</h1>
-
-<h4>Dati Anagrafici</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="FiscalCode">
-            @Html.AntiForgeryToken()
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="LastName" class="control-label"></label>
-                <input asp-for="LastName" class="form-control" />
-                <span asp-validation-for="LastName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Birthday" class="control-label"></label>
-                <input asp-for="Birthday" type="date" class="form-control" />
-                <span asp-validation-for="Birthday" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Gender" class="control-label"></label>
-                <select asp-for="Gender" class="form-control">
-                    <option value="M" selected>Maschio</option>
-                    <option value="F">Femmina</option>
-                </select>
-                <span asp-validation-for="Gender" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BirthOfCity" class="control-label"></label>
-                <div class="row">
-                    <div class="col-5">
-                        <select id="provinces" class="form-select"></select>
-                    </div>
-                    <div class="col-7">
-                        <select asp-for="BirthOfCity" id="cities" class="form-select"></select>
-                    </div>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">@ViewData["Title"]</h2>
                 </div>
-                <span asp-validation-for="BirthOfCity" class="text-danger"></span>
+                <div class="card-body">
+                    <h4>Dati Anagrafici</h4>
+                    <hr />
+                    <form asp-action="FiscalCode">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="form-group">
+                            <label asp-for="FirstName" class="control-label"></label>
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="LastName" class="control-label"></label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Birthday" class="control-label"></label>
+                            <input asp-for="Birthday" type="date" class="form-control" />
+                            <span asp-validation-for="Birthday" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Gender" class="control-label"></label>
+                            <select asp-for="Gender" class="form-control">
+                                <option value="M" selected>Maschio</option>
+                                <option value="F">Femmina</option>
+                            </select>
+                            <span asp-validation-for="Gender" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="BirthOfCity" class="control-label"></label>
+                            <div class="row">
+                                <div class="col-5">
+                                    <select id="provinces" class="form-select"></select>
+                                </div>
+                                <div class="col-7">
+                                    <select asp-for="BirthOfCity" id="cities" class="form-select"></select>
+                                </div>
+                            </div>
+                            <span asp-validation-for="BirthOfCity" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" value="Create" class="btn btn-primary btn-block" />
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
 @if (ViewBag.FiscalCode != null)
 {
-    <div class="alert alert-success">
+    <div class="alert alert-success mt-3">
         @ViewBag.FiscalCode
     </div>
 }

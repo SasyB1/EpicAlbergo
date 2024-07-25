@@ -1,32 +1,28 @@
 ﻿@{
-    ViewData["Title"] = "Search Customer and Reservations";
+    ViewData["Title"] = "Cerca per CF e  Pensione Completa";
 }
 
-<h1>Search Customer and Reservations</h1>
+<div class="container mt-5">
+    <h1 class="display-4 text-center mb-4">@ViewData["Title"]</h1>
 
-<div>
-    <div class="btn-group" role="group" aria-label="Search Options">
+    <div class="btn-group mb-4" role="group" aria-label="Search Options">
         <button type="button" class="btn btn-primary" id="searchCustomerButton">Search Customer</button>
         <button type="button" class="btn btn-primary" id="searchReservationsButton">Search Reservations</button>
     </div>
 
-
-    <div id="customerSearchSection" style="margin-top: 20px;">
+    <div id="customerSearchSection" class="mb-4">
         <input type="text" class="form-control" id="fiscalCode" name="fiscalCode" placeholder="Inserisci codice fiscale" />
-        <div id="searchResults" style="margin-top: 20px;"></div>
+        <div id="searchResults" class="mt-4"></div>
     </div>
 
-
-    <div id="reservationsSearchSection" style="display: none; margin-top: 20px;">
+    <div id="reservationsSearchSection" class="mb-4" style="display: none;">
         <div id="reservationsResults"></div>
     </div>
 </div>
 
 @section Scripts {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
-
             $('#searchCustomerButton').on('click', function () {
                 $('#customerSearchSection').show();
                 $('#reservationsSearchSection').hide();
@@ -37,7 +33,6 @@
                 $('#reservationsSearchSection').show();
                 loadFullBoardReservations();
             });
-
 
             $('#fiscalCode').on('input', function () {
                 var fiscalCode = $(this).val();
@@ -51,20 +46,21 @@
                                 var resultsHtml = '';
                                 response.data.forEach(function (customer) {
                                     resultsHtml += `
-                                                <div>
-                                                    <h4>${customer.customerName} ${customer.customerSurname}</h4>
-                                                    <p>ID: ${customer.customerId}</p>
-                                                    <p>Codice Fiscale: ${customer.customerTaxIdCode}</p>
-                                                    <p>Email: ${customer.customerEmail}</p>
-                                                    <p>Telefono: ${customer.customerTelephone}</p>
-                                                    <p>Telefono Casa: ${customer.customerHomeTelephone || 'N/A'}</p>
-                                                    <p>Indirizzo: ${customer.customerAddress}</p>
-                                                    <p>Città: ${customer.customerCity}</p>
-                                                    <p>CAP: ${customer.customerZIPCode}</p>
-                                                    <p>Data di Nascita: ${customer.customerBirthday}</p>
-                                                    <p>Genere: ${customer.gender}</p>
+                                                <div class="card mb-3">
+                                                    <div class="card-body">
+                                                        <h4 class="card-title">${customer.customerName} ${customer.customerSurname}</h4>
+                                                        <p class="card-text"><strong>ID:</strong> ${customer.customerId}</p>
+                                                        <p class="card-text"><strong>Codice Fiscale:</strong> ${customer.customerTaxIdCode}</p>
+                                                        <p class="card-text"><strong>Email:</strong> ${customer.customerEmail}</p>
+                                                        <p class="card-text"><strong>Telefono:</strong> ${customer.customerTelephone}</p>
+                                                        <p class="card-text"><strong>Telefono Casa:</strong> ${customer.customerHomeTelephone || 'N/A'}</p>
+                                                        <p class="card-text"><strong>Indirizzo:</strong> ${customer.customerAddress}</p>
+                                                        <p class="card-text"><strong>Città:</strong> ${customer.customerCity}</p>
+                                                        <p class="card-text"><strong>CAP:</strong> ${customer.customerZIPCode}</p>
+                                                        <p class="card-text"><strong>Data di Nascita:</strong> ${new Date(customer.customerBirthday).toLocaleDateString()}</p>
+                                                        <p class="card-text"><strong>Genere:</strong> ${customer.gender}</p>
+                                                    </div>
                                                 </div>
-                                                <hr/>
                                             `;
                                 });
                                 $('#searchResults').html(resultsHtml);
@@ -81,7 +77,6 @@
                 }
             });
 
-
             function loadFullBoardReservations() {
                 $.ajax({
                     url: '/Api/GetFullBoardReservations',
@@ -91,16 +86,16 @@
                             var resultsHtml = '';
                             response.data.forEach(function (reservation) {
                                 resultsHtml += `
-                                                    <div>
-                                    <h4>Reservation Number: ${reservation.reservationNumber}</h4>
-                                    <p><strong>Customer:</strong> ${reservation.customerName} ${reservation.customerSurname}</p>
-                                    <p><strong>Room Number:</strong> ${reservation.roomNumber}</p>
-                                    <p><strong>Room Description:</strong> ${reservation.roomDescription}</p>
-                                    <p><strong>Check-in Date:</strong> ${new Date(reservation.reservationStartStayDate).toLocaleDateString()}</p>
-                                    <p><strong>Check-out Date:</strong> ${new Date(reservation.reservationEndStayDate).toLocaleDateString()}</p>
-
-                                </div>
-                                            <hr/>
+                                            <div class="card mb-3">
+                                                <div class="card-body">
+                                                    <h4 class="card-title">Reservation Number: ${reservation.reservationNumber}</h4>
+                                                    <p class="card-text"><strong>Customer:</strong> ${reservation.customerName} ${reservation.customerSurname}</p>
+                                                    <p class="card-text"><strong>Room Number:</strong> ${reservation.roomNumber}</p>
+                                                    <p class="card-text"><strong>Room Description:</strong> ${reservation.roomDescription}</p>
+                                                    <p class="card-text"><strong>Check-in Date:</strong> ${new Date(reservation.reservationStartStayDate).toLocaleDateString()}</p>
+                                                    <p class="card-text"><strong>Check-out Date:</strong> ${new Date(reservation.reservationEndStayDate).toLocaleDateString()}</p>
+                                                </div>
+                                            </div>
                                         `;
                             });
                             $('#reservationsResults').html(resultsHtml);

@@ -4,34 +4,40 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
-
-<h4>User</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Index">
-            @Html.AntiForgeryToken()
-            <h2>Login</h2>
-            <div class="input-group form-group">
-                <input placeholder="Username" type="text" asp-for="Username" class="form-control" />
-                <span asp-validation-for="Username" class="text-danger"></span>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Login</h2>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Index">
+                        @Html.AntiForgeryToken()
+                        <div class="form-group">
+                            <label asp-for="Username" class="control-label">Username</label>
+                            <input placeholder="Username" type="text" asp-for="Username" class="form-control" />
+                            <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Password" class="control-label">Password</label>
+                            <input placeholder="Password" type="password" asp-for="Password" class="form-control">
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        <div class="form-group mt-2">
+                            <input type="submit" value="Login" class="btn btn-primary btn-block" />
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="input-group form-group">
-                <input placeholder="Password" type="password" asp-for="Password" class="form-control">
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Login" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

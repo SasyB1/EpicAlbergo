@@ -178,7 +178,7 @@ namespace EpicAlbergo.Services
                 {
                     conn.Open();
                     const string SELECT_COMMAND = @"
-                SELECT ReservationId, CustomerId, RoomId, ReservationNumber, ReservationStartStayDate, ReservationEndStayDate, ReservationDeposit, ReservationPrice, ReservationType
+                SELECT ReservationId, CustomerId, RoomId, ReservationNumber, ReservationStartStayDate, ReservationEndStayDate, ReservationDeposit, ReservationPrice, ReservationType, ReservationDate
                 FROM Reservations";
                     using (SqlCommand cmd = new SqlCommand(SELECT_COMMAND, conn))
                     {
@@ -196,7 +196,8 @@ namespace EpicAlbergo.Services
                                     ReservationEndStayDate = reader.GetDateTime(5),
                                     ReservationDeposit = reader.GetDecimal(6),
                                     ReservationPrice = reader.GetDecimal(7),
-                                    ReservationType = Enum.Parse<ReservationType>(reader.GetString(8))
+                                    ReservationType = Enum.Parse<ReservationType>(reader.GetString(8)),
+                                    ReservationDate = reader.GetDateTime(9)
                                 };
                                 reservations.Add(reservation);
                             }
@@ -276,7 +277,7 @@ namespace EpicAlbergo.Services
         {
             var model = new CheckoutDto
             {
-                ReservationServices = new List<ServiceAllCheckoutDto>()  
+                ReservationServices = new List<ServiceAllCheckoutDto>()
             };
 
             var connectionString = _config.GetConnectionString("DefaultConnection");
@@ -284,11 +285,13 @@ namespace EpicAlbergo.Services
             using (var conn = new SqlConnection(connectionString))
             {
                 await conn.OpenAsync();
+
                 var reservationQuery = @"
-            SELECT r.*, rm.RoomNumber 
-            FROM Reservations r 
-            JOIN Rooms rm ON r.RoomId = rm.RoomId 
-            WHERE r.ReservationId = @ReservationId";
+        SELECT r.*, rm.RoomNumber, c.CustomerName, c.CustomerSurname
+        FROM Reservations r 
+        JOIN Rooms rm ON r.RoomId = rm.RoomId 
+        JOIN Customers c ON r.CustomerId = c.CustomerId
+        WHERE r.ReservationId = @ReservationId";
 
                 using (var cmd = new SqlCommand(reservationQuery, conn))
                 {
@@ -315,22 +318,26 @@ namespace EpicAlbergo.Services
                                 RoomId = reader.GetInt32(reader.GetOrdinal("RoomId")),
                                 RoomNumber = reader.GetInt32(reader.GetOrdinal("RoomNumber"))
                             };
+
+                            model.CustomerName = reader.GetString(reader.GetOrdinal("CustomerName"));
+                            model.CustomerSurname = reader.GetString(reader.GetOrdinal("CustomerSurname"));
                         }
                     }
                 }
+
                 var serviceQuery = @"
-            SELECT 
-                rs.ServiceId, 
-                rs.ServiceDate, 
-                rs.ServiceQuantity, 
-                rs.ServicePrice, 
-                s.ServiceType 
-            FROM 
-                ReservationsServices rs 
-            INNER JOIN 
-                Services s ON rs.ServiceId = s.ServiceId 
-            WHERE 
-                rs.ReservationId = @ReservationId";
+        SELECT 
+            rs.ServiceId, 
+            rs.ServiceDate, 
+            rs.ServiceQuantity, 
+            rs.ServicePrice, 
+            s.ServiceType 
+        FROM 
+            ReservationsServices rs 
+        INNER JOIN 
+            Services s ON rs.ServiceId = s.ServiceId 
+        WHERE 
+            rs.ReservationId = @ReservationId";
 
                 using (var cmd = new SqlCommand(serviceQuery, conn))
                 {
@@ -363,7 +370,6 @@ namespace EpicAlbergo.Services
 
             return model;
         }
-
 
         public List<FullBoardDto> GetFullBoardReservations()
         {

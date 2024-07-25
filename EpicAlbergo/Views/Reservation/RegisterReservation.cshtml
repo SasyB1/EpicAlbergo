@@ -6,90 +6,98 @@
     var reservationTypes = ViewBag.ReservationTypes as IEnumerable<ReservationType>;
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">@ViewData["Title"]</h2>
+                </div>
+                <div class="card-body">
+                    <form asp-action="RegisterReservation" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-<form asp-action="RegisterReservation" method="post">
-    @Html.AntiForgeryToken()
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="form-group">
+                            <label asp-for="CustomerId" class="control-label"></label>
+                            <select asp-for="CustomerId" class="form-control" id="customerSelect">
+                                <option value="">Select a customer</option>
+                                @if (ViewBag.Customers != null)
+                                {
+                                    foreach (var customer in ViewBag.Customers)
+                                    {
+                                        <option value="@customer.CustomerId">@customer.CustomerName @customer.CustomerSurname</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="">No customers available</option>
+                                }
+                            </select>
+                            <span asp-validation-for="CustomerId" class="text-danger"></span>
+                        </div>
 
-    <div class="form-group">
-        <label asp-for="CustomerId" class="control-label"></label>
-        <select asp-for="CustomerId" class="form-control" id="customerSelect">
-            <option value="">Select a customer</option>
-            @if (ViewBag.Customers != null)
-            {
-                foreach (var customer in ViewBag.Customers)
-                {
-                    <option value="@customer.CustomerId">@customer.CustomerName @customer.CustomerSurname</option>
-                }
-            }
-            else
-            {
-                <option value="">No customers available</option>
-            }
-        </select>
-        <span asp-validation-for="CustomerId" class="text-danger"></span>
+                        <div class="form-group">
+                            <label asp-for="RoomId" class="control-label"></label>
+                            <select asp-for="RoomId" class="form-control" id="roomSelect">
+                                <option value="">Select a room</option>
+                            </select>
+                            <span asp-validation-for="RoomId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="ReservationStartStayDate" class="control-label"></label>
+                            <input asp-for="ReservationStartStayDate" class="form-control" type="date" id="reservationStartStayDate" />
+                            <span asp-validation-for="ReservationStartStayDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="ReservationEndStayDate" class="control-label"></label>
+                            <input asp-for="ReservationEndStayDate" class="form-control" type="date" id="reservationEndStayDate" />
+                            <span asp-validation-for="ReservationEndStayDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="ReservationDeposit" class="control-label"></label>
+                            <input asp-for="ReservationDeposit" class="form-control" type="number" step="0.01" />
+                            <span asp-validation-for="ReservationDeposit" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="ReservationPrice" class="control-label"></label>
+                            <input asp-for="ReservationPrice" class="form-control" type="number" id="reservationPrice" step="0.01" readonly />
+                            <span asp-validation-for="ReservationPrice" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="ReservationType" class="control-label"></label>
+                            <select asp-for="ReservationType" class="form-control">
+                                <option value="">Select a reservation type</option>
+                                @if (ViewBag.ReservationTypes != null)
+                                {
+                                    @foreach (var type in ViewBag.ReservationTypes)
+                                    {
+                                        <option value="@type.ToString()">@type.ToString()</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="">No reservation types available</option>
+                                }
+                            </select>
+                            <span asp-validation-for="ReservationType" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mt-2">
+                            <input type="submit" value="Register" class="btn btn-primary btn-block" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label asp-for="RoomId" class="control-label"></label>
-        <select asp-for="RoomId" class="form-control" id="roomSelect">
-            <option value="">Select a room</option>
-        </select>
-        <span asp-validation-for="RoomId" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="ReservationStartStayDate" class="control-label"></label>
-        <input asp-for="ReservationStartStayDate" class="form-control" type="date" id="reservationStartStayDate" />
-        <span asp-validation-for="ReservationStartStayDate" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="ReservationEndStayDate" class="control-label"></label>
-        <input asp-for="ReservationEndStayDate" class="form-control" type="date" id="reservationEndStayDate" />
-        <span asp-validation-for="ReservationEndStayDate" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="ReservationDeposit" class="control-label"></label>
-        <input asp-for="ReservationDeposit" class="form-control" type="number" step="0.01" />
-        <span asp-validation-for="ReservationDeposit" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="ReservationPrice" class="control-label"></label>
-        <input asp-for="ReservationPrice" class="form-control" type="number" id="reservationPrice" step="0.01" readonly />
-        <span asp-validation-for="ReservationPrice" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="ReservationType" class="control-label"></label>
-        <select asp-for="ReservationType" class="form-control">
-            <option value="">Select a reservation type</option>
-            @if (ViewBag.ReservationTypes != null)
-            {
-                @foreach (var type in ViewBag.ReservationTypes)
-                {
-                    <option value="@type.ToString()">@type.ToString()</option>
-                }
-            }
-            else
-            {
-                <option value="">No reservation types available</option>
-            }
-        </select>
-        <span asp-validation-for="ReservationType" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <input type="submit" value="Register" class="btn btn-primary" />
-    </div>
-</form>
-
-<div>
-    <a asp-action="Index">Back to reservations list</a>
 </div>
+
 
 @section Scripts {
     @{
@@ -161,6 +169,32 @@
                 }
             }
         });
+       
+            $(document).ready(function () {
+                function validateDates() {
+                    var startDate = new Date($('#reservationStartStayDate').val());
+                    var endDate = new Date($('#reservationEndStayDate').val());
+                    var errorMessage = "";
+
+                    if (startDate && endDate && startDate >= endDate) {
+                        errorMessage = "La data di fine soggiorno deve essere successiva alla data di inizio soggiorno.";
+                        $('#reservationEndStayDate').addClass('is-invalid');
+                    } else {
+                        $('#reservationEndStayDate').removeClass('is-invalid');
+                    }
+
+                    $('#reservationEndStayDate').siblings('.text-danger').text(errorMessage);
+                }
+
+                $('#reservationStartStayDate, #reservationEndStayDate').change(validateDates);
+
+                $('form').submit(function (event) {
+                    validateDates();
+                    if ($('#reservationEndStayDate').hasClass('is-invalid')) {
+                        event.preventDefault(); 
+                    }
+                });
+            });
+   
     </script>
 }
-

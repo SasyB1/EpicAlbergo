@@ -23,17 +23,26 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark"  asp-controller="Customer" asp-action="FiscalCode">Clienti</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Reservation" asp-action="RegisterReservation">Prenotazione</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Reservation" asp-action="Index">Registro</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Reservation" asp-action="SearchBy">Ricerche aggiuntive</a>
                         </li>
                     </ul>
                     <div class="d-lg-flex flex-lg-fill justify-content-end align-items-center">
                         @if (!Context.User.Identity.IsAuthenticated)
                         {
-                            <a asp-controller="Auth" asp-action="Index" class="text-white fw-semibold me-3">Login</a>
+                            <a asp-controller="Auth" asp-action="Index" class="text-decoration-none text-dark me-3">Login</a>
                         }
                         else
                         {
-                            <a asp-controller="Auth" asp-action="Logout" class="text-white fw-semibold me-3">Logout</a>
+                            <a asp-controller="Auth" asp-action="Logout" class="text-decoration-none text-dark  me-3">Logout</a>
                         }
                     </div>
                 </div>

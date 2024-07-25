@@ -1,86 +1,98 @@
 ﻿@model EpicAlbergo.Models.Dto.CustomerDto
 
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Registrazione";
 }
 
-<h1>Register</h1>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">@ViewData["Title"]</h2>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Register" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="form-group">
+                            <label asp-for="CustomerName" class="control-label " ></label>
+                            <input asp-for="CustomerName" class="form-control" readonly />
+                            <span asp-validation-for="CustomerName" class="text-danger"></span>
+                        </div>
 
-<form asp-action="Register" method="post">
-    @Html.AntiForgeryToken()
-    <div class="form-group">
-        <label asp-for="CustomerName"></label>
-        <input asp-for="CustomerName" class="form-control"  />
-        <input type="hidden" asp-for="CustomerName" />
-        <span asp-validation-for="CustomerName" class="text-danger"></span>
+                        <div class="form-group">
+                            <label asp-for="CustomerSurname" class="control-label"></label>
+                            <input asp-for="CustomerSurname" class="form-control" readonly />
+                            <span asp-validation-for="CustomerSurname" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="CustomerBirthday" class="control-label"></label>
+                            <input asp-for="CustomerBirthday" type="date" class="form-control" readonly />
+                            <span asp-validation-for="CustomerBirthday" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Gender" class="control-label"></label>
+                            <select asp-for="Gender" class="form-control" readonly>
+                                <option value="M">Maschio</option>
+                                <option value="F">Femmina</option>
+                            </select>
+                            <span asp-validation-for="Gender" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="CustomerAddress" class="control-label"></label>
+                            <input asp-for="CustomerAddress" class="form-control" />
+                            <span asp-validation-for="CustomerAddress" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="CustomerCity" class="control-label"></label>
+                            <input asp-for="CustomerCity" class="form-control" />
+                            <span asp-validation-for="CustomerCity" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="CustomerZIPCode" class="control-label"></label>
+                            <input asp-for="CustomerZIPCode" class="form-control" />
+                            <span asp-validation-for="CustomerZIPCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="CustomerEmail" class="control-label"></label>
+                            <input asp-for="CustomerEmail" class="form-control" />
+                            <span asp-validation-for="CustomerEmail" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="CustomerTelephone" class="control-label"></label>
+                            <input asp-for="CustomerTelephone" class="form-control" />
+                            <span asp-validation-for="CustomerTelephone" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="CustomerHomeTelephone" class="control-label"></label>
+                            <input asp-for="CustomerHomeTelephone" class="form-control" />
+                            <span asp-validation-for="CustomerHomeTelephone" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="CustomerTaxIdCode" class="control-label"></label>
+                            <input asp-for="CustomerTaxIdCode" class="form-control" readonly />
+                            <span asp-validation-for="CustomerTaxIdCode" class="text-danger"></span>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block mt-2">Submit Registration</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="form-group">
-        <label asp-for="CustomerSurname"></label>
-        <input asp-for="CustomerSurname" class="form-control"  />
-        <input type="hidden" asp-for="CustomerSurname" />
-        <span asp-validation-for="CustomerSurname" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="CustomerBirthday"></label>
-        <input asp-for="CustomerBirthday" type="date" class="form-control"  />
-        <input type="hidden" asp-for="CustomerBirthday" />
-        <span asp-validation-for="CustomerBirthday" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Gender"></label>
-        <select asp-for="Gender" class="form-control" >
-            <option value="M">Maschio</option>
-            <option value="F">Femmina</option>
-        </select>
-        <input type="hidden" asp-for="Gender" />
-        <span asp-validation-for="Gender" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="CustomerAddress"></label>
-        <input asp-for="CustomerAddress" class="form-control" />
-        <span asp-validation-for="CustomerAddress" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="CustomerCity"></label>
-        <input asp-for="CustomerCity" class="form-control" />
-        <span asp-validation-for="CustomerCity" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="CustomerZIPCode"></label>
-        <input asp-for="CustomerZIPCode" class="form-control" />
-        <span asp-validation-for="CustomerZIPCode" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="CustomerEmail"></label>
-        <input asp-for="CustomerEmail" class="form-control" />
-        <span asp-validation-for="CustomerEmail" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="CustomerTelephone"></label>
-        <input asp-for="CustomerTelephone" class="form-control" />
-        <span asp-validation-for="CustomerTelephone" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="CustomerHomeTelephone"></label>
-        <input asp-for="CustomerHomeTelephone" class="form-control" />
-        <span asp-validation-for="CustomerHomeTelephone" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="CustomerTaxIdCode"></label>
-        <input asp-for="CustomerTaxIdCode" class="form-control"  />
-        <input type="hidden" asp-for="CustomerTaxIdCode" />
-        <span asp-validation-for="CustomerTaxIdCode" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Submit Registration</button>
-</form>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
