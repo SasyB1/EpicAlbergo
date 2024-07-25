@@ -363,16 +363,35 @@ namespace EpicAlbergo.Services
         }
 
 
-        public List<Reservation> GetFullBoardReservations()
+        public List<FullBoardDto> GetFullBoardReservations()
         {
-            var reservations = new List<Reservation>();
+            var reservations = new List<FullBoardDto>();
 
             try
             {
                 using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
                 {
                     conn.Open();
-                    const string query = "SELECT * FROM Reservations WHERE ReservationType = @ReservationType";
+                    const string query = @"
+                SELECT 
+                    r.ReservationId,
+                    r.CustomerId,
+                    r.RoomId,
+                    r.ReservationNumber,
+                    r.ReservationDate,
+                    r.ReservationStartStayDate,
+                    r.ReservationEndStayDate,
+                    r.ReservationDeposit,
+                    r.ReservationPrice,
+                    r.ReservationType,
+                    c.CustomerName,
+                    c.CustomerSurname,
+                    ro.RoomNumber,
+                    ro.RoomDescription
+                FROM Reservations r
+                INNER JOIN Customers c ON r.CustomerId = c.CustomerId
+                INNER JOIN Rooms ro ON r.RoomId = ro.RoomId
+                WHERE r.ReservationType = @ReservationType";
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@ReservationType", "FullBoard");
@@ -380,7 +399,7 @@ namespace EpicAlbergo.Services
                         {
                             while (reader.Read())
                             {
-                                var reservation = new Reservation
+                                var reservation = new FullBoardDto
                                 {
                                     ReservationId = reader.GetInt32(reader.GetOrdinal("ReservationId")),
                                     CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
@@ -391,7 +410,11 @@ namespace EpicAlbergo.Services
                                     ReservationEndStayDate = reader.GetDateTime(reader.GetOrdinal("ReservationEndStayDate")),
                                     ReservationDeposit = reader.GetDecimal(reader.GetOrdinal("ReservationDeposit")),
                                     ReservationPrice = reader.GetDecimal(reader.GetOrdinal("ReservationPrice")),
-                                    ReservationType = Enum.Parse<ReservationType>(reader.GetString(reader.GetOrdinal("ReservationType")))
+                                    ReservationType = Enum.Parse<ReservationType>(reader.GetString(reader.GetOrdinal("ReservationType"))),
+                                    CustomerName = reader.GetString(reader.GetOrdinal("CustomerName")),
+                                    CustomerSurname = reader.GetString(reader.GetOrdinal("CustomerSurname")),
+                                    RoomNumber = reader.GetInt32(reader.GetOrdinal("RoomNumber")),
+                                    RoomDescription = reader.GetString(reader.GetOrdinal("RoomDescription"))
                                 };
                                 reservations.Add(reservation);
                             }
@@ -406,6 +429,7 @@ namespace EpicAlbergo.Services
 
             return reservations;
         }
+
 
     }
 }

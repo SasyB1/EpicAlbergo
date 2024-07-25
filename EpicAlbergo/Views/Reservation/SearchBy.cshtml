@@ -91,12 +91,15 @@
                             var resultsHtml = '';
                             response.data.forEach(function (reservation) {
                                 resultsHtml += `
-                                            <div>
-                                                <h4>Reservation Number: ${reservation.reservationNumber}</h4>
-                                                <p>Customer ID: ${reservation.customerId}</p>
-                                                        <p>Check-in Date: ${reservation.reservationStartStayDate}</p>
-                                                        <p>Check-out Date: ${reservation.reservationEndStayDate}</p>
-                                            </div>
+                                                    <div>
+                                    <h4>Reservation Number: ${reservation.reservationNumber}</h4>
+                                    <p><strong>Customer:</strong> ${reservation.customerName} ${reservation.customerSurname}</p>
+                                    <p><strong>Room Number:</strong> ${reservation.roomNumber}</p>
+                                    <p><strong>Room Description:</strong> ${reservation.roomDescription}</p>
+                                    <p><strong>Check-in Date:</strong> ${new Date(reservation.reservationStartStayDate).toLocaleDateString()}</p>
+                                    <p><strong>Check-out Date:</strong> ${new Date(reservation.reservationEndStayDate).toLocaleDateString()}</p>
+
+                                </div>
                                             <hr/>
                                         `;
                             });
