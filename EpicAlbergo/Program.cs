@@ -1,3 +1,4 @@
+using EpicAlbergo;
 using EpicAlbergo.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +23,13 @@ builder
         options.LoginPath = "/Auth";
         options.AccessDeniedPath = "/Home/Index";
     });
+
+builder.Services
+    .AddAuthorization(options =>
+    {
+        options.AddPolicy(Policies.IsAdmin, policy => policy.RequireRole("admin"));
+        
+    });
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -38,6 +46,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
 
 app.MapControllerRoute(
     name: "default",

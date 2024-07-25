@@ -3,10 +3,12 @@ using EpicAlbergo.Services;
 using EpicAlbergo.Models.Dto;
 using EpicAlbergo.Models;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace EpicAlbergo.Controllers
 {
+    [Authorize(Policy = Policies.IsAdmin)]
     public class CustomerController : Controller
     {
         private readonly FiscalCodeService _fiscalCodeService;
@@ -44,6 +46,7 @@ namespace EpicAlbergo.Controllers
       
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult FiscalCode(FiscalCodeDto model)
         {
             if (ModelState.IsValid)
@@ -101,6 +104,7 @@ namespace EpicAlbergo.Controllers
 
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Register(CustomerDto model)
         {
             if (ModelState.IsValid)

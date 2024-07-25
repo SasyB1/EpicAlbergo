@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using EpicAlbergo.Services;
 using EpicAlbergo.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EpicAlbergo.Controllers
 {
+    [Authorize(Policy = Policies.IsAdmin)]
     public class ReservationController : Controller
     {
         private readonly ReservationService _reservationService;
@@ -33,6 +35,7 @@ namespace EpicAlbergo.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult RegisterReservation(ReservationDto reservation)
         {
             if (ModelState.IsValid)
@@ -100,6 +103,7 @@ namespace EpicAlbergo.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult AssociateService(ServiceReservationDto serviceReservation)
         {
             if (ModelState.IsValid)

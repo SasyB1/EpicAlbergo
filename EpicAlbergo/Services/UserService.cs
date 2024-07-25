@@ -18,45 +18,70 @@ namespace EpicAlbergo.Services
             _http = http;
         }
 
-        public User GetUser(UserDto user)
+        public User GetUser(UserDto userDto)
         {
             try
             {
-                using (
-                    SqlConnection conn = new SqlConnection(
-                        _config.GetConnectionString("DefaultConnection")
-                    )
-                )
+                using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
                 {
                     conn.Open();
-                    const string SELECT_BY_ID_COMMAND =
-                        "SELECT * FROM Users WHERE Username = @Username AND Password = @Password";
-                    using (SqlCommand cmd = new SqlCommand(SELECT_BY_ID_COMMAND, conn))
+                    const string SELECT_USER_COMMAND = @"
+                SELECT UserId, Username, Password
+                FROM Users
+                WHERE Username = @Username AND Password = @Password";
+
+                    User user = null;
+                    using (SqlCommand cmd = new SqlCommand(SELECT_USER_COMMAND, conn))
                     {
-                        cmd.Parameters.AddWithValue("@Username", user.Username);
-                        cmd.Parameters.AddWithValue("@Password", user.Password);
+                        cmd.Parameters.AddWithValue("@Username", userDto.Username);
+                        cmd.Parameters.AddWithValue("@Password", userDto.Password);
+
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
                             {
-                                User u = new User
+                                user = new User
                                 {
                                     UserId = reader.GetInt32(0),
                                     Username = reader.GetString(1),
-                                    Password = reader.GetString(2)
+                                    Password = reader.GetString(2),
+                                    Roles = new List<string>()
                                 };
-                                return u;
                             }
                         }
                     }
+
+                    if (user != null)
+                    {
+                        const string SELECT_ROLES_COMMAND = @"
+                    SELECT r.RoleType
+                    FROM UsersRoles ur
+                    JOIN Roles r ON ur.RoleId = r.RoleId
+                    WHERE ur.UserId = @UserId";
+
+                        using (SqlCommand cmd = new SqlCommand(SELECT_ROLES_COMMAND, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@UserId", user.UserId);
+
+                            using (SqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    user.Roles.Add(reader.GetString(0));
+                                }
+                            }
+                        }
+                    }
+
+                    return user;
                 }
             }
             catch (Exception ex)
             {
                 throw new Exception("Errore nel recupero dell'utente", ex);
             }
-            return null;
         }
+
 
         public async Task Login(User user)
         {
@@ -65,7 +90,10 @@ namespace EpicAlbergo.Services
                 new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString())
             };
-
+            foreach (var role in user.Roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
             var claimsIdentity = new ClaimsIdentity(
                 claims,
                 CookieAuthenticationDefaults.AuthenticationScheme
