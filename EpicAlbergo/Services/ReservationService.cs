@@ -270,7 +270,7 @@ namespace EpicAlbergo.Services
                 throw new Exception("Errore nel controllo della presenza del servizio: " + ex.Message, ex);
             }
         }
-        public async Task<CheckoutDto> GetCheckoutViewModelAsync(int reservationId)
+        public async Task<CheckoutDto> GetCheckout(int reservationId)
         {
             var model = new CheckoutDto
             {
