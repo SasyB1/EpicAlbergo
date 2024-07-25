@@ -1,0 +1,116 @@
+﻿@{
+    ViewData["Title"] = "Search Customer and Reservations";
+}
+
+<h1>Search Customer and Reservations</h1>
+
+<div>
+    <!-- Group Buttons -->
+    <div class="btn-group" role="group" aria-label="Search Options">
+        <button type="button" class="btn btn-primary" id="searchCustomerButton">Search Customer</button>
+        <button type="button" class="btn btn-primary" id="searchReservationsButton">Search Reservations</button>
+    </div>
+
+    <!-- Customer Search Section -->
+    <div id="customerSearchSection" style="margin-top: 20px;">
+        <input type="text" class="form-control" id="fiscalCode" name="fiscalCode" placeholder="Inserisci codice fiscale" />
+        <div id="searchResults" style="margin-top: 20px;"></div>
+    </div>
+
+    <!-- Reservations Search Section -->
+    <div id="reservationsSearchSection" style="display: none; margin-top: 20px;">
+        <div id="reservationsResults"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Handle button clicks
+            $('#searchCustomerButton').on('click', function () {
+                $('#customerSearchSection').show();
+                $('#reservationsSearchSection').hide();
+            });
+
+            $('#searchReservationsButton').on('click', function () {
+                $('#customerSearchSection').hide();
+                $('#reservationsSearchSection').show();
+                loadFullBoardReservations();
+            });
+
+            // Handle input changes for customer search
+            $('#fiscalCode').on('input', function () {
+                var fiscalCode = $(this).val();
+                if (fiscalCode.length > 0) {
+                    $.ajax({
+                        url: '/Api/SearchByPartialFiscalCode',
+                        type: 'GET',
+                        data: { partialFiscalCode: fiscalCode },
+                        success: function (response) {
+                            if (response.success) {
+                                var resultsHtml = '';
+                                response.data.forEach(function (customer) {
+                                    resultsHtml += `
+                                                <div>
+                                                    <h4>${customer.customerName} ${customer.customerSurname}</h4>
+                                                    <p>ID: ${customer.customerId}</p>
+                                                    <p>Codice Fiscale: ${customer.customerTaxIdCode}</p>
+                                                    <p>Email: ${customer.customerEmail}</p>
+                                                    <p>Telefono: ${customer.customerTelephone}</p>
+                                                    <p>Telefono Casa: ${customer.customerHomeTelephone || 'N/A'}</p>
+                                                    <p>Indirizzo: ${customer.customerAddress}</p>
+                                                    <p>Città: ${customer.customerCity}</p>
+                                                    <p>CAP: ${customer.customerZIPCode}</p>
+                                                    <p>Data di Nascita: ${customer.customerBirthday}</p>
+                                                    <p>Genere: ${customer.gender}</p>
+                                                </div>
+                                                <hr/>
+                                            `;
+                                });
+                                $('#searchResults').html(resultsHtml);
+                            } else {
+                                $('#searchResults').html(`<p class="text-danger">${response.message}</p>`);
+                            }
+                        },
+                        error: function () {
+                            $('#searchResults').html(`<p class="text-danger">Errore nella ricerca del cliente. Riprova più tardi.</p>`);
+                        }
+                    });
+                } else {
+                    $('#searchResults').empty();
+                }
+            });
+
+            // Function to load FullBoard reservations
+            function loadFullBoardReservations() {
+                $.ajax({
+                    url: '/Api/GetFullBoardReservations',
+                    type: 'GET',
+                    success: function (response) {
+                        if (response.success) {
+                            var resultsHtml = '';
+                            response.data.forEach(function (reservation) {
+                                resultsHtml += `
+                                            <div>
+                                                <h4>Reservation Number: ${reservation.reservationNumber}</h4>
+                                                <p>Customer ID: ${reservation.customerId}</p>
+                                                        <p>Check-in Date: ${reservation.reservationStartStayDate}</p>
+                                                        <p>Check-out Date: ${reservation.reservationEndStayDate}</p>
+                                            </div>
+                                            <hr/>
+                                        `;
+                            });
+                            $('#reservationsResults').html(resultsHtml);
+                        } else {
+                            $('#reservationsResults').html(`<p class="text-danger">${response.message}</p>`);
+                        }
+                    },
+                    error: function () {
+                        $('#reservationsResults').html(`<p class="text-danger">Errore nella ricerca delle prenotazioni. Riprova più tardi.</p>`);
+                    }
+                });
+            }
+        });
+    </script>
+}

@@ -363,6 +363,49 @@ namespace EpicAlbergo.Services
         }
 
 
+        public List<Reservation> GetFullBoardReservations()
+        {
+            var reservations = new List<Reservation>();
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+                {
+                    conn.Open();
+                    const string query = "SELECT * FROM Reservations WHERE ReservationType = @ReservationType";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@ReservationType", "FullBoard");
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                var reservation = new Reservation
+                                {
+                                    ReservationId = reader.GetInt32(reader.GetOrdinal("ReservationId")),
+                                    CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                    RoomId = reader.GetInt32(reader.GetOrdinal("RoomId")),
+                                    ReservationNumber = reader.GetString(reader.GetOrdinal("ReservationNumber")),
+                                    ReservationDate = reader.GetDateTime(reader.GetOrdinal("ReservationDate")),
+                                    ReservationStartStayDate = reader.GetDateTime(reader.GetOrdinal("ReservationStartStayDate")),
+                                    ReservationEndStayDate = reader.GetDateTime(reader.GetOrdinal("ReservationEndStayDate")),
+                                    ReservationDeposit = reader.GetDecimal(reader.GetOrdinal("ReservationDeposit")),
+                                    ReservationPrice = reader.GetDecimal(reader.GetOrdinal("ReservationPrice")),
+                                    ReservationType = Enum.Parse<ReservationType>(reader.GetString(reader.GetOrdinal("ReservationType")))
+                                };
+                                reservations.Add(reservation);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Errore nel recupero delle prenotazioni: " + ex.Message, ex);
+            }
+
+            return reservations;
+        }
 
     }
 }

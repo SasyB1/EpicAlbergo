@@ -129,5 +129,9 @@ namespace EpicAlbergo.Controllers
             return View(checkoutDto);
         }
 
+        public IActionResult SearchBy()
+            {
+            return View();
+        }
     }
 }

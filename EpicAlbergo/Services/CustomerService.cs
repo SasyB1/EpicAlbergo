@@ -113,5 +113,53 @@ namespace EpicAlbergo.Services
             }
             return customers;
         }
-    } 
+
+        public List<Customer> GetCustomersByPartialFiscalCode(string partialFiscalCode)
+        {
+            var customers = new List<Customer>();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("DefaultConnection")))
+                {
+                    conn.Open();
+                    const string query = "SELECT * FROM Customers WHERE CustomerTaxIdCode LIKE @PartialFiscalCode";
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@PartialFiscalCode", "%" + partialFiscalCode + "%");
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                var customer = new Customer
+                                {
+                                    CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                    CustomerSurname = reader.GetString(reader.GetOrdinal("CustomerSurname")),
+                                    CustomerName = reader.GetString(reader.GetOrdinal("CustomerName")),
+                                    CustomerBirthCity = reader.GetString(reader.GetOrdinal("CustomerBirthCity")),
+                                    CustomerAddress = reader.GetString(reader.GetOrdinal("CustomerAddress")),
+                                    CustomerCity = reader.GetString(reader.GetOrdinal("CustomerCity")),
+                                    CustomerZIPCode = reader.GetString(reader.GetOrdinal("CustomerZIPCode")),
+                                    CustomerEmail = reader.GetString(reader.GetOrdinal("CustomerEmail")),
+                                    CustomerHomeTelephone = reader.GetString(reader.GetOrdinal("CustomerHomeTelephone")),
+                                    CustomerTelephone = reader.GetString(reader.GetOrdinal("CustomerTelephone")),
+                                    CustomerTaxIdCode = reader.GetString(reader.GetOrdinal("CustomerTaxIdCode")),
+                                    CustomerBirthday = DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("CustomerBirthday"))),
+                                    Gender = reader.GetString(reader.GetOrdinal("Gender")).FirstOrDefault()
+                                };
+                                customers.Add(customer);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Errore nel recupero dei clienti: " + ex.Message, ex);
+            }
+            return customers;
+        }
+
+
+
+    }
 }
