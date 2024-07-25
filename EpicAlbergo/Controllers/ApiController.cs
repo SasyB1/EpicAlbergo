@@ -1,4 +1,4 @@
-﻿using EpicAlbergo.Services;
+﻿using EpicAlbergo.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +8,10 @@ namespace EpicAlbergo.Controllers
     [ApiController]
     public class ApiController : ControllerBase
     {
-        private readonly CustomerService _customerService;
-        private readonly ReservationService _reservationService;
+        private readonly ICustomerService _customerService;
+        private readonly IReservationService _reservationService;
 
-        public ApiController(CustomerService customerService, ReservationService reservationService)
+        public ApiController(ICustomerService customerService, IReservationService reservationService)
         {
             _customerService = customerService;
             _reservationService = reservationService;

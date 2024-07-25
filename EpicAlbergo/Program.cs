@@ -1,5 +1,6 @@
 using EpicAlbergo;
 using EpicAlbergo.Services;
+using EpicAlbergo.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,13 +9,13 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSession();
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.
-    AddScoped<ReservationService>()
-    .AddScoped<CustomerService>()
-    .AddSingleton<FiscalCodeService>()
-    .AddSingleton<CsvCityService>()
-    .AddScoped<RoomService>()
-    .AddScoped<UserService>();
+builder.Services
+    .AddScoped<IReservationService, ReservationService>()
+    .AddScoped<ICustomerService, CustomerService>()
+    .AddSingleton<IFiscalCodeService, FiscalCodeService>()
+    .AddSingleton<ICsvCityService, CsvCityService>()
+    .AddScoped<IRoomService, RoomService>()
+    .AddScoped<IUserService, UserService>();
 
 builder
     .Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

@@ -1,8 +1,9 @@
 ﻿using EpicAlbergo.Models.Dto;
+using EpicAlbergo.Interfaces;
 
 namespace EpicAlbergo.Services
 {
-    public class CsvCityService
+    public class CsvCityService : ICsvCityService
     {
         private readonly List<CityDto> _cityList = [];
 

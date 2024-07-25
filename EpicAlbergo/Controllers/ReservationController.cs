@@ -1,6 +1,6 @@
 ﻿using EpicAlbergo.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
-using EpicAlbergo.Services;
+using EpicAlbergo.Interfaces;
 using EpicAlbergo.Models;
 using Microsoft.AspNetCore.Authorization;
 
@@ -9,12 +9,12 @@ namespace EpicAlbergo.Controllers
     [Authorize(Policy = Policies.IsAdmin)]
     public class ReservationController : Controller
     {
-        private readonly ReservationService _reservationService;
-        private readonly CustomerService _customerService;
-        private readonly RoomService _roomService;
+        private readonly IReservationService _reservationService;
+        private readonly ICustomerService _customerService;
+        private readonly IRoomService _roomService;
 
 
-        public ReservationController(ReservationService reservationService, CustomerService customerService, RoomService roomService)
+        public ReservationController(IReservationService reservationService, ICustomerService customerService, IRoomService roomService)
         {
             _reservationService = reservationService;
             _customerService = customerService;

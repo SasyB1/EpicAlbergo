@@ -30,10 +30,10 @@
             </div>
             <div class="form-group">
                 <label asp-for="Gender" class="control-label"></label>
-                <input value="M" type="radio" asp-for="Gender" checked class="form-check-input" />
-                <label class="form-check-label">M</label>
-                <input value="F" type="radio" asp-for="Gender" class="form-check-input" />
-                <label class="form-check-label">F</label>
+                <select asp-for="Gender" class="form-control">
+                    <option value="M" selected>Maschio</option>
+                    <option value="F">Femmina</option>
+                </select>
                 <span asp-validation-for="Gender" class="text-danger"></span>
             </div>
             <div class="form-group">

@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using EpicAlbergo.Models.Dto;
-using EpicAlbergo.Services;
+using EpicAlbergo.Interfaces;
 
 namespace EpicAlbergo.Controllers
 {
 
     public class AuthController : Controller
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
 
-        public AuthController(UserService userService)
+        public AuthController(IUserService userService)
         {
             _userService = userService;
         }

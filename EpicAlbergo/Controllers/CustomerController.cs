@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using EpicAlbergo.Services;
+using EpicAlbergo.Interfaces;
 using EpicAlbergo.Models.Dto;
 using EpicAlbergo.Models;
 using Newtonsoft.Json;
@@ -11,11 +11,11 @@ namespace EpicAlbergo.Controllers
     [Authorize(Policy = Policies.IsAdmin)]
     public class CustomerController : Controller
     {
-        private readonly FiscalCodeService _fiscalCodeService;
-        private readonly CsvCityService _cityService;
-        private readonly CustomerService _customerService;
+        private readonly IFiscalCodeService _fiscalCodeService;
+        private readonly ICsvCityService _cityService;
+        private readonly ICustomerService _customerService;
 
-        public CustomerController(FiscalCodeService fiscalCodeService, CsvCityService csvCityService, CustomerService customerService)
+        public CustomerController(IFiscalCodeService fiscalCodeService, ICsvCityService csvCityService, ICustomerService customerService)
         {
             _fiscalCodeService = fiscalCodeService;
             _cityService = csvCityService;

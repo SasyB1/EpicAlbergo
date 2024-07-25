@@ -2,16 +2,17 @@
 using Microsoft.Data.SqlClient;
 using EpicAlbergo.Models.Dto;
 using EpicAlbergo.Models;
+using EpicAlbergo.Interfaces;
 
 namespace EpicAlbergo.Services
 {
-    public class CustomerService
+    public class CustomerService : ICustomerService
     {
-        private readonly FiscalCodeService _fiscalCodeService;
-        private readonly CsvCityService _cityService;
+        private readonly IFiscalCodeService _fiscalCodeService;
+        private readonly ICsvCityService _cityService;
         private readonly IConfiguration _config;
 
-        public CustomerService(FiscalCodeService fiscalCodeService, CsvCityService cityService, IConfiguration config)
+        public CustomerService(IFiscalCodeService fiscalCodeService, ICsvCityService cityService, IConfiguration config)
         {
             _fiscalCodeService = fiscalCodeService;
             _cityService = cityService;

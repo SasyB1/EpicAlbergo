@@ -4,10 +4,11 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Data.SqlClient;
 using System.Security.Claims;
 using EpicAlbergo.Models.Dto;
+using EpicAlbergo.Interfaces;
 
 namespace EpicAlbergo.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
         private readonly IConfiguration _config;
         private readonly IHttpContextAccessor _http;

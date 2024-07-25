@@ -1,9 +1,11 @@
 ﻿using EpicAlbergo.Models.Dto;
 using Microsoft.Data.SqlClient;
 using EpicAlbergo.Models;
+using EpicAlbergo.Interfaces;
+
 namespace EpicAlbergo.Services
 {
-    public class ReservationService
+    public class ReservationService : IReservationService
     {
         private readonly IConfiguration _config;
 

@@ -1,9 +1,10 @@
 ﻿using System.Text;
 using EpicAlbergo.Models.Dto;
+using EpicAlbergo.Interfaces;
 
 namespace EpicAlbergo.Services
 {
-    public class FiscalCodeService
+    public class FiscalCodeService : IFiscalCodeService
     {
         public string GenerateFiscalCode(PersonalDataDto data)
         {
