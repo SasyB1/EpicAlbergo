@@ -47,7 +47,7 @@ namespace EpicAlbergo.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult FiscalCode(FiscalCodeDto model)
+        public IActionResult FiscalCode([Bind("FirstName,LastName,Birthday,Gender,BirthOfCity")] FiscalCodeDto model)
         {
             if (ModelState.IsValid)
             {
@@ -105,7 +105,7 @@ namespace EpicAlbergo.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Register(CustomerDto model)
+        public IActionResult Register([Bind("CustomerName,CustomerSurname,CustomerBirthday,Gender,CustomerAddress,CustomerCity,CustomerZIPCode,CustomerEmail,CustomerTelephone,CustomerHomeTelephone,CustomerTaxIdCode")] CustomerDto model)
         {
             if (ModelState.IsValid)
             {

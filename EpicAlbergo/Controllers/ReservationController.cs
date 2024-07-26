@@ -36,7 +36,7 @@ namespace EpicAlbergo.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult RegisterReservation(ReservationDto reservation)
+        public IActionResult RegisterReservation([Bind("CustomerId,RoomId,ReservationStartStayDate,ReservationEndStayDate,ReservationDeposit,ReservationPrice,ReservationType")] ReservationDto reservation)
         {
             if (ModelState.IsValid)
             {
@@ -104,7 +104,7 @@ namespace EpicAlbergo.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AssociateService(ServiceReservationDto serviceReservation)
+        public IActionResult AssociateService([Bind("ReservationId,ServiceId,ServiceDate,ServiceQuantity,ServicePrice")] ServiceReservationDto serviceReservation)
         {
             if (ModelState.IsValid)
             {
